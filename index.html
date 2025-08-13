@@ -576,19 +576,19 @@
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
         import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 
-        // SUBSTITUA ESTA CONFIGURAÇÃO PELA SUA DO FIREBASE
+        // Configuração do Firebase
         const firebaseConfig = {
-            // VOCÊ PRECISA PEGAR ESSAS INFORMAÇÕES NO SEU PROJETO FIREBASE
-            apiKey: "SUA_API_KEY",
-            authDomain: "SEU_PROJECT_ID.firebaseapp.com",
-            projectId: "SEU_PROJECT_ID",
-            storageBucket: "SEU_PROJECT_ID.appspot.com",
-            messagingSenderId: "SEU_SENDER_ID",
-            appId: "SUA_APP_ID"
+            apiKey: "AIzaSyDxGmV4-l9TC3DnvjQXCwrMx5L3NHW2UQQ",
+            authDomain: "femdicon-69c9d.firebaseapp.com",
+            projectId: "femdicon-69c9d",
+            storageBucket: "femdicon-69c9d.firebasestorage.app",
+            messagingSenderId: "28653887191",
+            appId: "1:28653887191:web:4b9dd1e916973426735a92",
+            measurementId: "G-L24NPHVJSH"
         };
 
         // Verificar se Firebase está configurado
-        const isFirebaseConfigured = firebaseConfig.apiKey !== "SUA_API_KEY";
+        const isFirebaseConfigured = true; // Agora está configurado!
 
         let app, db;
         let convenios = [];
