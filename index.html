@@ -45,6 +45,50 @@
             font-size: 1.1em;
         }
 
+        .connection-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            z-index: 1000;
+        }
+
+        .status-online {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-offline {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         .form-section {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -124,6 +168,13 @@
             background: linear-gradient(135deg, #2980b9, #1f639a);
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
 
         .btn-danger {
@@ -378,136 +429,239 @@
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
+
+            .connection-status {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin-bottom: 15px;
+                display: inline-block;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <div class="connection-status" id="connectionStatus">
+            🔄 Conectando...
+        </div>
+
         <div class="header">
             <h1>🏛️ Sistema de Acompanhamento de Convênios</h1>
             <p>Gestão e controle de instrumentos de repasse com organizações da sociedade civil</p>
         </div>
 
-        <!-- Estatísticas -->
-        <div class="stats-grid">
-            <div class="stat-card stat-total">
-                <div class="stat-number" id="totalConvenios">0</div>
-                <div class="stat-label">Total de Convênios</div>
-            </div>
-            <div class="stat-card stat-vigentes">
-                <div class="stat-number" id="conveniосVigentes">0</div>
-                <div class="stat-label">Vigentes</div>
-            </div>
-            <div class="stat-card stat-proximos">
-                <div class="stat-number" id="conveniosProximos">0</div>
-                <div class="stat-label">Próximos ao Vencimento</div>
-            </div>
-            <div class="stat-card stat-vencidos">
-                <div class="stat-number" id="conveniosVencidos">0</div>
-                <div class="stat-label">Vencidos</div>
-            </div>
+        <div id="loadingSection" class="loading">
+            <div class="spinner"></div>
+            <h3>Carregando dados...</h3>
+            <p>Conectando com o banco de dados</p>
         </div>
 
-        <!-- Formulário -->
-        <div class="form-section">
-            <h2>📝 Cadastrar Novo Convênio/Instrumento de Repasse</h2>
-            <form id="convenioForm">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="numero">Número do Convênio/Instrumento *</label>
-                        <input type="text" id="numero" name="numero" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="organizacao">Organização da Sociedade Civil *</label>
-                        <input type="text" id="organizacao" name="organizacao" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="tipo">Tipo de Instrumento *</label>
-                        <select id="tipo" name="tipo" required>
-                            <option value="">Selecione...</option>
-                            <option value="Convênio">Convênio</option>
-                            <option value="Termo de Colaboração">Termo de Colaboração</option>
-                            <option value="Termo de Fomento">Termo de Fomento</option>
-                            <option value="Acordo de Cooperação">Acordo de Cooperação</option>
-                            <option value="Contrato de Repasse">Contrato de Repasse</option>
-                            <option value="Outro">Outro</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="valor">Valor (R$)</label>
-                        <input type="number" id="valor" name="valor" step="0.01" min="0">
-                    </div>
-                    <div class="form-group">
-                        <label for="dataInicio">Data de Início *</label>
-                        <input type="date" id="dataInicio" name="dataInicio" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="dataFim">Data de Término *</label>
-                        <input type="date" id="dataFim" name="dataFim" required>
-                    </div>
+        <div id="mainContent" style="display: none;">
+            <!-- Estatísticas -->
+            <div class="stats-grid">
+                <div class="stat-card stat-total">
+                    <div class="stat-number" id="totalConvenios">0</div>
+                    <div class="stat-label">Total de Convênios</div>
                 </div>
-                <div class="form-group">
-                    <label for="objeto">Objeto/Finalidade</label>
-                    <textarea id="objeto" name="objeto" placeholder="Descreva o objeto ou finalidade do convênio/instrumento"></textarea>
+                <div class="stat-card stat-vigentes">
+                    <div class="stat-number" id="conveniosVigentes">0</div>
+                    <div class="stat-label">Vigentes</div>
                 </div>
-                <div class="form-group">
-                    <label for="observacoes">Observações</label>
-                    <textarea id="observacoes" name="observacoes" placeholder="Observações adicionais, contatos, etc."></textarea>
+                <div class="stat-card stat-proximos">
+                    <div class="stat-number" id="conveniosProximos">0</div>
+                    <div class="stat-label">Próximos ao Vencimento</div>
                 </div>
-                <div class="button-group">
-                    <button type="submit" class="btn">
-                        ➕ Adicionar Convênio
-                    </button>
-                    <button type="button" class="btn btn-export" onclick="exportarCSV()">
-                        📊 Exportar CSV
-                    </button>
-                    <button type="button" class="btn btn-danger" onclick="limparTodos()">
-                        🗑️ Limpar Todos
-                    </button>
+                <div class="stat-card stat-vencidos">
+                    <div class="stat-number" id="conveniosVencidos">0</div>
+                    <div class="stat-label">Vencidos</div>
                 </div>
-            </form>
-        </div>
-
-        <!-- Tabela -->
-        <div class="table-section">
-            <div class="table-header">
-                <h2>📋 Lista de Convênios e Instrumentos</h2>
-                <input type="text" id="searchBox" class="search-box" placeholder="🔍 Pesquisar por número, organização ou tipo...">
             </div>
-            <div class="table-container">
-                <table id="conveniosTable">
-                    <thead>
-                        <tr>
-                            <th>Número</th>
-                            <th>Organização</th>
-                            <th>Tipo</th>
-                            <th>Valor</th>
-                            <th>Início</th>
-                            <th>Término</th>
-                            <th>Dias Restantes</th>
-                            <th>Status</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="conveniosTableBody">
-                        <tr>
-                            <td colspan="9" class="empty-state">
-                                <h3>Nenhum convênio cadastrado</h3>
-                                <p>Adicione o primeiro convênio usando o formulário acima</p>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+
+            <!-- Formulário -->
+            <div class="form-section">
+                <h2>📝 Cadastrar Novo Convênio/Instrumento de Repasse</h2>
+                <form id="convenioForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="numero">Número do Convênio/Instrumento *</label>
+                            <input type="text" id="numero" name="numero" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="organizacao">Organização da Sociedade Civil *</label>
+                            <input type="text" id="organizacao" name="organizacao" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="tipo">Tipo de Instrumento *</label>
+                            <select id="tipo" name="tipo" required>
+                                <option value="">Selecione...</option>
+                                <option value="Convênio">Convênio</option>
+                                <option value="Termo de Colaboração">Termo de Colaboração</option>
+                                <option value="Termo de Fomento">Termo de Fomento</option>
+                                <option value="Acordo de Cooperação">Acordo de Cooperação</option>
+                                <option value="Contrato de Repasse">Contrato de Repasse</option>
+                                <option value="Outro">Outro</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="valor">Valor (R$)</label>
+                            <input type="number" id="valor" name="valor" step="0.01" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="dataInicio">Data de Início *</label>
+                            <input type="date" id="dataInicio" name="dataInicio" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="dataFim">Data de Término *</label>
+                            <input type="date" id="dataFim" name="dataFim" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="objeto">Objeto/Finalidade</label>
+                        <textarea id="objeto" name="objeto" placeholder="Descreva o objeto ou finalidade do convênio/instrumento"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="observacoes">Observações</label>
+                        <textarea id="observacoes" name="observacoes" placeholder="Observações adicionais, contatos, etc."></textarea>
+                    </div>
+                    <div class="button-group">
+                        <button type="submit" class="btn" id="submitBtn">
+                            ➕ Adicionar Convênio
+                        </button>
+                        <button type="button" class="btn btn-export" onclick="exportarCSV()">
+                            📊 Exportar CSV
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Tabela -->
+            <div class="table-section">
+                <div class="table-header">
+                    <h2>📋 Lista de Convênios e Instrumentos</h2>
+                    <input type="text" id="searchBox" class="search-box" placeholder="🔍 Pesquisar por número, organização ou tipo...">
+                </div>
+                <div class="table-container">
+                    <table id="conveniosTable">
+                        <thead>
+                            <tr>
+                                <th>Número</th>
+                                <th>Organização</th>
+                                <th>Tipo</th>
+                                <th>Valor</th>
+                                <th>Início</th>
+                                <th>Término</th>
+                                <th>Dias Restantes</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="conveniosTableBody">
+                            <tr>
+                                <td colspan="9" class="empty-state">
+                                    <h3>Nenhum convênio cadastrado</h3>
+                                    <p>Adicione o primeiro convênio usando o formulário acima</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 
-    <script>
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import Firebase functions
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+        // SUBSTITUA ESTA CONFIGURAÇÃO PELA SUA DO FIREBASE
+        const firebaseConfig = {
+            // VOCÊ PRECISA PEGAR ESSAS INFORMAÇÕES NO SEU PROJETO FIREBASE
+            apiKey: "SUA_API_KEY",
+            authDomain: "SEU_PROJECT_ID.firebaseapp.com",
+            projectId: "SEU_PROJECT_ID",
+            storageBucket: "SEU_PROJECT_ID.appspot.com",
+            messagingSenderId: "SEU_SENDER_ID",
+            appId: "SUA_APP_ID"
+        };
+
+        // Verificar se Firebase está configurado
+        const isFirebaseConfigured = firebaseConfig.apiKey !== "SUA_API_KEY";
+
+        let app, db;
         let convenios = [];
         let editandoId = null;
 
-        // Carregar dados salvos
-        function carregarDados() {
+        // Elementos DOM
+        const loadingSection = document.getElementById('loadingSection');
+        const mainContent = document.getElementById('mainContent');
+        const connectionStatus = document.getElementById('connectionStatus');
+        const submitBtn = document.getElementById('submitBtn');
+
+        // Inicializar aplicação
+        async function inicializar() {
+            if (isFirebaseConfigured) {
+                try {
+                    app = initializeApp(firebaseConfig);
+                    db = getFirestore(app);
+                    
+                    // Escutar mudanças em tempo real
+                    const conveniosRef = collection(db, 'convenios');
+                    onSnapshot(conveniosRef, (snapshot) => {
+                        convenios = [];
+                        snapshot.forEach((doc) => {
+                            convenios.push({
+                                id: doc.id,
+                                ...doc.data()
+                            });
+                        });
+                        renderizarTabela();
+                        atualizarEstatisticas();
+                        atualizarStatus('online');
+                    }, (error) => {
+                        console.error("Erro ao escutar mudanças:", error);
+                        atualizarStatus('offline');
+                        carregarDadosLocais(); // Fallback para dados locais
+                    });
+
+                    atualizarStatus('online');
+                } catch (error) {
+                    console.error("Erro ao conectar Firebase:", error);
+                    atualizarStatus('offline');
+                    carregarDadosLocais();
+                }
+            } else {
+                // Modo local se Firebase não configurado
+                console.log("Firebase não configurado, usando armazenamento local");
+                atualizarStatus('local');
+                carregarDadosLocais();
+            }
+
+            // Mostrar conteúdo principal
+            loadingSection.style.display = 'none';
+            mainContent.style.display = 'block';
+        }
+
+        // Atualizar status de conexão
+        function atualizarStatus(status) {
+            const statusElement = connectionStatus;
+            
+            if (status === 'online') {
+                statusElement.textContent = '🟢 Online - Dados sincronizados';
+                statusElement.className = 'connection-status status-online';
+            } else if (status === 'local') {
+                statusElement.textContent = '🟡 Modo Local - Configure Firebase para sincronizar';
+                statusElement.className = 'connection-status status-offline';
+            } else {
+                statusElement.textContent = '🔴 Offline - Usando dados locais';
+                statusElement.className = 'connection-status status-offline';
+            }
+        }
+
+        // Carregar dados do localStorage como fallback
+        function carregarDadosLocais() {
             const dadosSalvos = localStorage.getItem('convenios');
             if (dadosSalvos) {
                 convenios = JSON.parse(dadosSalvos);
@@ -516,8 +670,42 @@
             }
         }
 
-        // Salvar dados
-        function salvarDados() {
+        // Salvar no Firebase
+        async function salvarNoFirebase(convenio) {
+            if (!isFirebaseConfigured || !db) return false;
+            
+            try {
+                if (convenio.id && typeof convenio.id === 'string') {
+                    // Atualizar existente
+                    const convenioRef = doc(db, 'convenios', convenio.id);
+                    await updateDoc(convenioRef, convenio);
+                } else {
+                    // Criar novo
+                    delete convenio.id; // Remove o ID temporário
+                    await addDoc(collection(db, 'convenios'), convenio);
+                }
+                return true;
+            } catch (error) {
+                console.error("Erro ao salvar:", error);
+                return false;
+            }
+        }
+
+        // Excluir do Firebase
+        async function excluirDoFirebase(id) {
+            if (!isFirebaseConfigured || !db) return false;
+            
+            try {
+                await deleteDoc(doc(db, 'convenios', id));
+                return true;
+            } catch (error) {
+                console.error("Erro ao excluir:", error);
+                return false;
+            }
+        }
+
+        // Salvar localmente como backup
+        function salvarLocalmente() {
             localStorage.setItem('convenios', JSON.stringify(convenios));
         }
 
@@ -552,13 +740,16 @@
             return new Date(data).toLocaleDateString('pt-BR');
         }
 
-        // Adicionar/Editar convênio
-        document.getElementById('convenioForm').addEventListener('submit', function(e) {
+        // Formulário submit
+        document.getElementById('convenioForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+            
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '⏳ Salvando...';
             
             const formData = new FormData(e.target);
             const convenio = {
-                id: editandoId || Date.now(),
+                id: editandoId || Date.now().toString(),
                 numero: formData.get('numero'),
                 organizacao: formData.get('organizacao'),
                 tipo: formData.get('tipo'),
@@ -569,18 +760,24 @@
                 observacoes: formData.get('observacoes')
             };
 
-            if (editandoId) {
-                const index = convenios.findIndex(c => c.id === editandoId);
-                convenios[index] = convenio;
-                editandoId = null;
-                document.querySelector('button[type="submit"]').textContent = '➕ Adicionar Convênio';
-            } else {
-                convenios.push(convenio);
+            const sucesso = await salvarNoFirebase(convenio);
+            
+            if (!sucesso) {
+                // Fallback para armazenamento local
+                if (editandoId) {
+                    const index = convenios.findIndex(c => c.id === editandoId);
+                    convenios[index] = convenio;
+                } else {
+                    convenios.push(convenio);
+                }
+                salvarLocalmente();
+                renderizarTabela();
+                atualizarEstatisticas();
             }
 
-            salvarDados();
-            renderizarTabela();
-            atualizarEstatisticas();
+            editandoId = null;
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '➕ Adicionar Convênio';
             e.target.reset();
         });
 
@@ -646,10 +843,10 @@
                         <td><span class="status-badge ${statusClass}">${statusText}</span></td>
                         <td>
                             <div class="action-buttons">
-                                <button class="btn btn-small" onclick="editarConvenio(${convenio.id})" title="Editar">
+                                <button class="btn btn-small" onclick="editarConvenio('${convenio.id}')" title="Editar">
                                     ✏️
                                 </button>
-                                <button class="btn btn-small btn-danger" onclick="excluirConvenio(${convenio.id})" title="Excluir">
+                                <button class="btn btn-small btn-danger" onclick="excluirConvenio('${convenio.id}')" title="Excluir">
                                     🗑️
                                 </button>
                             </div>
@@ -676,13 +873,13 @@
             });
 
             document.getElementById('totalConvenios').textContent = total;
-            document.getElementById('conveniосVigentes').textContent = vigentes;
+            document.getElementById('conveniosVigentes').textContent = vigentes;
             document.getElementById('conveniosProximos').textContent = proximos;
             document.getElementById('conveniosVencidos').textContent = vencidos;
         }
 
         // Editar convênio
-        function editarConvenio(id) {
+        window.editarConvenio = function(id) {
             const convenio = convenios.find(c => c.id === id);
             if (!convenio) return;
 
@@ -697,34 +894,29 @@
             document.getElementById('objeto').value = convenio.objeto || '';
             document.getElementById('observacoes').value = convenio.observacoes || '';
             
-            document.querySelector('button[type="submit"]').textContent = '✏️ Atualizar Convênio';
+            submitBtn.innerHTML = '✏️ Atualizar Convênio';
             
             // Scroll para o formulário
             document.querySelector('.form-section').scrollIntoView({ behavior: 'smooth' });
         }
 
         // Excluir convênio
-        function excluirConvenio(id) {
-            if (confirm('Tem certeza que deseja excluir este convênio?')) {
+        window.excluirConvenio = async function(id) {
+            if (!confirm('Tem certeza que deseja excluir este convênio?')) return;
+            
+            const sucesso = await excluirDoFirebase(id);
+            
+            if (!sucesso) {
+                // Fallback para exclusão local
                 convenios = convenios.filter(c => c.id !== id);
-                salvarDados();
-                renderizarTabela();
-                atualizarEstatisticas();
-            }
-        }
-
-        // Limpar todos
-        function limparTodos() {
-            if (confirm('Tem certeza que deseja excluir TODOS os convênios? Esta ação não pode ser desfeita!')) {
-                convenios = [];
-                salvarDados();
+                salvarLocalmente();
                 renderizarTabela();
                 atualizarEstatisticas();
             }
         }
 
         // Exportar CSV
-        function exportarCSV() {
+        window.exportarCSV = function() {
             if (convenios.length === 0) {
                 alert('Não há dados para exportar!');
                 return;
@@ -774,8 +966,10 @@
         // Pesquisa
         document.getElementById('searchBox').addEventListener('input', renderizarTabela);
 
-        // Inicializar
-        carregarDados();
+        // Inicializar aplicação
+        inicializar();
     </script>
 </body>
 </html>
+
+        //
