@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acompanhamento de Convênios e Instrumentos de Repasse - Debug</title>
+    <title>Acompanhamento de Convênios e Instrumentos de Repasse</title>
     <style>
         * {
             margin: 0;
@@ -45,16 +45,228 @@
             font-size: 1.1em;
         }
 
-        .connection-status {
+        /* ESTILOS DE LOGIN */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .login-modal {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: loginSlideIn 0.3s ease-out;
+        }
+
+        @keyframes loginSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header h2 {
+            color: #2c3e50;
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+
+        .login-header p {
+            color: #7f8c8d;
+            font-size: 1em;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .login-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .login-group label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        .login-group input {
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .login-group input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+            background: white;
+        }
+
+        .login-btn {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .login-btn:hover {
+            background: linear-gradient(135deg, #2980b9, #1f639a);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
+        }
+
+        .login-btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .login-error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #f5c6cb;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        .login-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #bee5eb;
+            font-size: 0.9em;
+            margin-top: 15px;
+        }
+
+        .login-info strong {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        /* USER STATUS */
+        .user-status {
             position: fixed;
             top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 0.9em;
+            font-weight: 600;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-status.guest {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .user-status.admin {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .logout-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+
+        /* PROTEÇÃO DE ELEMENTOS */
+        .admin-only {
+            display: none;
+        }
+
+        .admin-only.visible {
+            display: block;
+        }
+
+        .admin-only.visible-flex {
+            display: flex;
+        }
+
+        .admin-only.visible-inline {
+            display: inline-flex;
+        }
+
+        .guest-message {
+            background: rgba(255, 243, 205, 0.95);
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .guest-message h3 {
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .connection-status {
+            position: fixed;
+            top: 70px;
             right: 20px;
             padding: 8px 15px;
             border-radius: 20px;
             font-size: 0.85em;
             font-weight: 600;
             z-index: 1000;
-            max-width: 250px;
         }
 
         .status-online {
@@ -67,64 +279,6 @@
             background: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
-        }
-
-        .debug-panel {
-            background: #2c3e50;
-            color: white;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 25px;
-            font-family: 'Courier New', monospace;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        }
-
-        .debug-panel h3 {
-            color: #3498db;
-            margin-bottom: 15px;
-            font-size: 1.2em;
-        }
-
-        .debug-log {
-            max-height: 300px;
-            overflow-y: auto;
-            background: #34495e;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
-
-        .log-entry {
-            margin-bottom: 8px;
-            padding: 8px;
-            border-left: 4px solid #3498db;
-            background: rgba(52, 152, 219, 0.1);
-            border-radius: 4px;
-            font-size: 0.9em;
-        }
-
-        .log-success {
-            border-color: #27ae60;
-            background: rgba(39, 174, 96, 0.1);
-            color: #2ecc71;
-        }
-
-        .log-error {
-            border-color: #e74c3c;
-            background: rgba(231, 76, 60, 0.1);
-            color: #e74c3c;
-        }
-
-        .log-info {
-            border-color: #f39c12;
-            background: rgba(243, 156, 18, 0.1);
-            color: #f39c12;
-        }
-
-        .debug-buttons {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
         }
 
         .loading {
@@ -485,7 +639,7 @@
                 min-width: auto;
             }
             
-            .button-group, .debug-buttons {
+            .button-group {
                 justify-content: center;
             }
             
@@ -498,19 +652,74 @@
                 grid-template-columns: repeat(2, 1fr);
             }
 
+            .user-status {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin-bottom: 15px;
+                display: inline-flex;
+            }
+
             .connection-status {
                 position: relative;
                 top: auto;
                 right: auto;
                 margin-bottom: 15px;
                 display: inline-block;
-                max-width: none;
+            }
+
+            .login-modal {
+                padding: 30px 20px;
+                margin: 20px;
             }
         }
     </style>
 </head>
 <body>
+    <!-- TELA DE LOGIN -->
+    <div id="loginOverlay" class="login-overlay">
+        <div class="login-modal">
+            <div class="login-header">
+                <h2>🔐 Acesso ao Sistema</h2>
+                <p>Digite suas credenciais para continuar</p>
+            </div>
+            <form id="loginForm" class="login-form">
+                <div class="login-group">
+                    <label for="loginUsername">Usuário</label>
+                    <input type="text" id="loginUsername" required autocomplete="username">
+                </div>
+                <div class="login-group">
+                    <label for="loginPassword">Senha</label>
+                    <input type="password" id="loginPassword" required autocomplete="current-password">
+                </div>
+                <button type="submit" class="login-btn" id="loginSubmitBtn">
+                    🚀 Entrar
+                </button>
+                <div id="loginError" class="login-error" style="display: none;"></div>
+                <div class="login-info">
+                    <strong>👁️ Modo Visitante</strong>
+                    Você pode visualizar os convênios sem fazer login, mas não poderá editar ou adicionar novos registros.
+                    <br><br>
+                    <button type="button" class="btn" onclick="entrarComoVisitante()" style="width: 100%; margin-top: 10px;">
+                        👀 Continuar como Visitante
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="container">
+        <!-- STATUS DO USUÁRIO -->
+        <div id="userStatus" class="user-status guest">
+            <span id="userInfo">👤 Visitante</span>
+            <button id="loginBtn" class="btn" style="padding: 5px 12px; font-size: 0.8em;" onclick="mostrarLogin()">
+                🔑 Fazer Login
+            </button>
+            <button id="logoutBtn" class="logout-btn" style="display: none;" onclick="logout()">
+                🚪 Sair
+            </button>
+        </div>
+
         <div class="connection-status" id="connectionStatus">
             🔄 Conectando...
         </div>
@@ -518,22 +727,6 @@
         <div class="header">
             <h1>🏛️ Sistema de Acompanhamento de Convênios</h1>
             <p>Gestão e controle de instrumentos de repasse com organizações da sociedade civil</p>
-            <p style="color: #e74c3c; margin-top: 10px; font-weight: 600;">📋 VERSÃO DEBUG - Diagnóstico Firebase</p>
-        </div>
-
-        <!-- Painel de Debug -->
-        <div class="debug-panel">
-            <h3>🔧 Painel de Debug Firebase</h3>
-            <div id="debugLog" class="debug-log">
-                <div class="log-entry log-info">🚀 Sistema iniciando...</div>
-            </div>
-            <div class="debug-buttons">
-                <button class="btn btn-warning" onclick="testarConexao()">🔧 Testar Conexão</button>
-                <button class="btn btn-export" onclick="adicionarTeste()">➕ Adicionar Teste</button>
-                <button class="btn" onclick="listarTodos()">📋 Listar Firebase</button>
-                <button class="btn btn-danger" onclick="limparLog()">🗑️ Limpar Log</button>
-                <button class="btn" onclick="verificarRegras()">⚙️ Verificar Regras</button>
-            </div>
         </div>
 
         <div id="loadingSection" class="loading">
@@ -543,6 +736,12 @@
         </div>
 
         <div id="mainContent" style="display: none;">
+            <!-- MENSAGEM PARA VISITANTES -->
+            <div id="guestMessage" class="guest-message">
+                <h3>👀 Modo Visitante</h3>
+                <p>Você pode visualizar todos os convênios, mas precisa fazer login para editar ou adicionar novos registros.</p>
+            </div>
+
             <!-- Estatísticas -->
             <div class="stats-grid">
                 <div class="stat-card stat-total">
@@ -563,8 +762,8 @@
                 </div>
             </div>
 
-            <!-- Formulário -->
-            <div class="form-section">
+            <!-- Formulário - APENAS PARA ADMINISTRADORES -->
+            <div class="form-section admin-only">
                 <h2>📝 Cadastrar Novo Convênio/Instrumento de Repasse</h2>
                 <form id="convenioForm">
                     <div class="form-grid">
@@ -638,7 +837,7 @@
                                 <th>Término</th>
                                 <th>Dias Restantes</th>
                                 <th>Status</th>
-                                <th>Ações</th>
+                                <th class="admin-only">Ações</th>
                             </tr>
                         </thead>
                         <tbody id="conveniosTableBody">
@@ -672,27 +871,152 @@
             measurementId: "G-L24NPHVJSH"
         };
 
+        // CONFIGURAÇÕES DE LOGIN - ALTERE AQUI!
+        const loginConfig = {
+            usuarios: [
+                { username: "sueila", password: "123456789", role: "admin", name: "Administrador" },
+                { username: "conceicao", password: "123456789", role: "admin", name: "Administrador" },
+                { username: "icaro", password: "123456789", role: "admin", name: "Gestor" }
+            ]
+        };
+
         let app, db;
         let convenios = [];
         let editandoId = null;
+        let currentUser = null; // null = visitante, objeto = usuário logado
 
         // Elementos DOM
         const loadingSection = document.getElementById('loadingSection');
         const mainContent = document.getElementById('mainContent');
         const connectionStatus = document.getElementById('connectionStatus');
         const submitBtn = document.getElementById('submitBtn');
-        const debugLog = document.getElementById('debugLog');
+        const loginOverlay = document.getElementById('loginOverlay');
+        const loginForm = document.getElementById('loginForm');
+        const loginError = document.getElementById('loginError');
+        const userStatus = document.getElementById('userStatus');
+        const userInfo = document.getElementById('userInfo');
+        const loginBtn = document.getElementById('loginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const guestMessage = document.getElementById('guestMessage');
 
-        // Debug log
-        function log(message, type = 'info') {
-            const time = new Date().toLocaleTimeString();
-            const entry = document.createElement('div');
-            entry.className = `log-entry log-${type}`;
-            entry.innerHTML = `[${time}] ${message}`;
-            debugLog.appendChild(entry);
-            debugLog.scrollTop = debugLog.scrollHeight;
-            console.log(`[${type.toUpperCase()}] ${message}`);
+        // SISTEMA DE LOGIN
+        function verificarLogin() {
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                atualizarInterfaceUsuario();
+                loginOverlay.style.display = 'none';
+            } else {
+                // Mostrar tela de login por padrão
+                loginOverlay.style.display = 'flex';
+            }
         }
+
+        function atualizarInterfaceUsuario() {
+            const adminElements = document.querySelectorAll('.admin-only');
+            
+            if (currentUser && currentUser.role === 'admin') {
+                // Usuário logado - mostrar elementos admin
+                adminElements.forEach(el => {
+                    if (el.tagName === 'TH' || el.tagName === 'TD') {
+                        el.classList.add('visible');
+                    } else if (el.style.display === 'flex' || el.classList.contains('button-group') || el.classList.contains('action-buttons')) {
+                        el.classList.add('visible-flex');
+                    } else if (el.tagName === 'BUTTON') {
+                        el.classList.add('visible-inline');
+                    } else {
+                        el.classList.add('visible');
+                    }
+                });
+                
+                userStatus.className = 'user-status admin';
+                userInfo.textContent = `👤 ${currentUser.name}`;
+                loginBtn.style.display = 'none';
+                logoutBtn.style.display = 'inline-block';
+                guestMessage.style.display = 'none';
+                
+            } else {
+                // Visitante - esconder elementos admin
+                adminElements.forEach(el => {
+                    el.classList.remove('visible', 'visible-flex', 'visible-inline');
+                });
+                
+                userStatus.className = 'user-status guest';
+                userInfo.textContent = '👤 Visitante';
+                loginBtn.style.display = 'inline-block';
+                logoutBtn.style.display = 'none';
+                guestMessage.style.display = 'block';
+            }
+        }
+
+        function mostrarLogin() {
+            loginOverlay.style.display = 'flex';
+            document.getElementById('loginUsername').focus();
+        }
+
+        function entrarComoVisitante() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            atualizarInterfaceUsuario();
+            loginOverlay.style.display = 'none';
+        }
+
+        function logout() {
+            if (confirm('Tem certeza que deseja sair?')) {
+                currentUser = null;
+                localStorage.removeItem('currentUser');
+                atualizarInterfaceUsuario();
+                // Limpar formulário se estiver editando
+                if (editandoId) {
+                    document.getElementById('convenioForm').reset();
+                    editandoId = null;
+                    if (submitBtn) {
+                        submitBtn.innerHTML = '➕ Adicionar Convênio';
+                    }
+                }
+            }
+        }
+
+        // Fazer login disponível globalmente
+        window.mostrarLogin = mostrarLogin;
+        window.entrarComoVisitante = entrarComoVisitante;
+        window.logout = logout;
+
+        // Form de login
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            const submitBtn = document.getElementById('loginSubmitBtn');
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = '🔄 Verificando...';
+            
+            // Simular delay de autenticação
+            setTimeout(() => {
+                const usuario = loginConfig.usuarios.find(u => 
+                    u.username === username && u.password === password
+                );
+                
+                if (usuario) {
+                    currentUser = usuario;
+                    localStorage.setItem('currentUser', JSON.stringify(usuario));
+                    atualizarInterfaceUsuario();
+                    loginOverlay.style.display = 'none';
+                    loginError.style.display = 'none';
+                    loginForm.reset();
+                } else {
+                    loginError.textContent = '❌ Usuário ou senha incorretos';
+                    loginError.style.display = 'block';
+                    document.getElementById('loginPassword').value = '';
+                    document.getElementById('loginPassword').focus();
+                }
+                
+                submitBtn.disabled = false;
+                submitBtn.textContent = '🚀 Entrar';
+            }, 1000);
+        });
 
         // Atualizar status de conexão
         function atualizarStatus(status, details = '') {
@@ -710,44 +1034,30 @@
         // Inicializar aplicação
         async function inicializar() {
             try {
-                log('🚀 Inicializando Firebase...', 'info');
-                log(`📡 Projeto: ${firebaseConfig.projectId}`, 'info');
-                
                 app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 
-                log('✅ Firebase inicializado com sucesso!', 'success');
-                
-                // Teste de conexão inicial
-                await testarConexaoSilencioso();
-                
                 // Escutar mudanças em tempo real
                 const conveniosRef = collection(db, 'convenios');
-                log('📡 Configurando listener em tempo real...', 'info');
-                
                 onSnapshot(conveniosRef, (snapshot) => {
-                    log(`📥 Recebidos ${snapshot.size} documentos do Firebase`, 'success');
                     convenios = [];
                     snapshot.forEach((doc) => {
                         convenios.push({
                             id: doc.id,
                             ...doc.data()
                         });
-                        log(`📄 Documento carregado: ${doc.id}`, 'info');
                     });
                     renderizarTabela();
                     atualizarEstatisticas();
                     atualizarStatus('online', `${convenios.length} convênios carregados`);
                 }, (error) => {
-                    log(`❌ Erro ao escutar mudanças: ${error.message}`, 'error');
-                    log(`🔍 Código do erro: ${error.code}`, 'error');
+                    console.error("Erro ao escutar mudanças:", error);
                     atualizarStatus('offline', error.message);
                     carregarDadosLocais(); // Fallback para dados locais
                 });
 
             } catch (error) {
-                log(`❌ Erro ao inicializar Firebase: ${error.message}`, 'error');
-                log(`🔍 Código do erro: ${error.code}`, 'error');
+                console.error("Erro ao inicializar Firebase:", error);
                 atualizarStatus('offline', error.message);
                 carregarDadosLocais();
             }
@@ -755,77 +1065,60 @@
             // Mostrar conteúdo principal
             loadingSection.style.display = 'none';
             mainContent.style.display = 'block';
-        }
-
-        // Testar conexão (silencioso)
-        async function testarConexaoSilencioso() {
-            try {
-                log('🔍 Testando conexão com Firestore...', 'info');
-                const testCollection = collection(db, 'convenios');
-                const snapshot = await getDocs(testCollection);
-                log(`✅ Conexão OK - ${snapshot.size} documentos encontrados`, 'success');
-                return true;
-            } catch (error) {
-                log(`❌ Erro na conexão: ${error.message}`, 'error');
-                log(`🔍 Código: ${error.code}`, 'error');
-                return false;
-            }
+            
+            // Verificar login após carregar
+            verificarLogin();
         }
 
         // Carregar dados do localStorage como fallback
         function carregarDadosLocais() {
-            log('💾 Carregando dados locais...', 'info');
             const dadosSalvos = localStorage.getItem('convenios');
             if (dadosSalvos) {
                 convenios = JSON.parse(dadosSalvos);
-                log(`💾 ${convenios.length} convênios carregados do localStorage`, 'success');
                 renderizarTabela();
                 atualizarEstatisticas();
-            } else {
-                log('💾 Nenhum dado local encontrado', 'info');
             }
         }
 
         // Salvar no Firebase
         async function salvarNoFirebase(convenio) {
+            if (!currentUser || currentUser.role !== 'admin') {
+                alert('❌ Acesso negado! Você precisa estar logado como administrador.');
+                return false;
+            }
+
             try {
-                log(`💾 Tentando salvar no Firebase: ${convenio.numero}`, 'info');
-                
-                // Verificar se é edição (editandoId existe e é um ID do Firebase)
                 if (editandoId && editandoId.length > 15) {
-                    // Atualizar existente - só se editandoId for um ID real do Firebase
-                    log(`✏️ Atualizando documento existente: ${editandoId}`, 'info');
+                    // Atualizar existente
                     const convenioData = { ...convenio };
-                    delete convenioData.id; // Remove o ID local
+                    delete convenioData.id;
                     const convenioRef = doc(db, 'convenios', editandoId);
                     await updateDoc(convenioRef, convenioData);
-                    log(`✅ Documento atualizado com sucesso!`, 'success');
                 } else {
-                    // Criar novo - sempre criar quando não estiver editando
-                    log(`➕ Criando novo documento...`, 'info');
+                    // Criar novo
                     const convenioData = { ...convenio };
-                    delete convenioData.id; // Remove o ID temporário
+                    delete convenioData.id;
                     const docRef = await addDoc(collection(db, 'convenios'), convenioData);
-                    log(`✅ Documento criado com ID: ${docRef.id}`, 'success');
                 }
                 return true;
             } catch (error) {
-                log(`❌ Erro ao salvar: ${error.message}`, 'error');
-                log(`🔍 Código: ${error.code}`, 'error');
+                console.error("Erro ao salvar:", error);
                 return false;
             }
         }
 
         // Excluir do Firebase
         async function excluirDoFirebase(id) {
+            if (!currentUser || currentUser.role !== 'admin') {
+                alert('❌ Acesso negado! Você precisa estar logado como administrador.');
+                return false;
+            }
+            
             try {
-                log(`🗑️ Tentando excluir documento: ${id}`, 'info');
                 await deleteDoc(doc(db, 'convenios', id));
-                log(`✅ Documento excluído com sucesso!`, 'success');
                 return true;
             } catch (error) {
-                log(`❌ Erro ao excluir: ${error.message}`, 'error');
-                log(`🔍 Código: ${error.code}`, 'error');
+                console.error("Erro ao excluir:", error);
                 return false;
             }
         }
@@ -833,114 +1126,6 @@
         // Salvar localmente como backup
         function salvarLocalmente() {
             localStorage.setItem('convenios', JSON.stringify(convenios));
-            log(`💾 Dados salvos localmente (${convenios.length} convênios)`, 'info');
-        }
-
-        // Funções de teste debug
-        window.testarConexao = async function() {
-            log('🔧 Teste manual de conexão iniciado...', 'info');
-            const sucesso = await testarConexaoSilencioso();
-            if (sucesso) {
-                alert('✅ Conexão Firebase funcionando!');
-            } else {
-                alert('❌ Erro na conexão - verifique o log');
-            }
-        }
-
-        window.adicionarTeste = async function() {
-            log('➕ Adicionando convênio teste...', 'info');
-            const convenioTeste = {
-                numero: `TESTE-${Date.now()}`,
-                organizacao: 'Organização de Teste',
-                tipo: 'Convênio',
-                valor: 50000,
-                dataInicio: '2024-01-01',
-                dataFim: '2024-12-31',
-                objeto: 'Convênio de teste para validar conexão',
-                observacoes: 'Criado automaticamente pelo sistema de debug',
-                timestamp: new Date().toISOString()
-            };
-
-            log(`📄 Dados do teste: ${JSON.stringify(convenioTeste, null, 2)}`, 'info');
-
-            try {
-                log('🚀 Chamando addDoc diretamente...', 'info');
-                const docRef = await addDoc(collection(db, 'convenios'), convenioTeste);
-                log(`✅ SUCESSO! Convênio teste criado com ID: ${docRef.id}`, 'success');
-                log(`🔗 Verifique no Firebase Console agora!`, 'success');
-                alert('✅ Convênio teste adicionado com sucesso!\n\nVerifique o Firebase Console - deve aparecer a coleção "convenios"');
-            } catch (error) {
-                log(`❌ Erro ao adicionar teste: ${error.message}`, 'error');
-                log(`🔍 Código: ${error.code}`, 'error');
-                
-                if (error.code === 'permission-denied') {
-                    alert('🚨 ERRO DE PERMISSÃO!\n\nVocê precisa configurar as regras do Firestore:\n\n1. Vá no Firebase Console\n2. Firestore Database → Regras\n3. Configure as regras de segurança');
-                } else {
-                    alert('❌ Erro ao adicionar teste - veja o log para detalhes');
-                }
-            }
-        }
-
-        window.listarTodos = async function() {
-            log('📋 Listando todos os documentos do Firebase...', 'info');
-            try {
-                const querySnapshot = await getDocs(collection(db, 'convenios'));
-                log(`📋 Total de documentos encontrados: ${querySnapshot.size}`, 'success');
-                
-                if (querySnapshot.size === 0) {
-                    log('📄 Nenhum documento encontrado na coleção', 'info');
-                } else {
-                    querySnapshot.forEach((doc, index) => {
-                        const data = doc.data();
-                        log(`📄 Doc ${index + 1} - ID: ${doc.id}`, 'info');
-                        log(`📄 Dados: ${JSON.stringify(data, null, 2)}`, 'info');
-                    });
-                }
-                
-                alert(`📋 ${querySnapshot.size} documentos listados no log`);
-            } catch (error) {
-                log(`❌ Erro ao listar documentos: ${error.message}`, 'error');
-                log(`🔍 Código: ${error.code}`, 'error');
-                alert('❌ Erro ao listar - veja o log');
-            }
-        }
-
-        window.verificarRegras = async function() {
-            log('⚙️ Verificando regras de segurança...', 'info');
-            try {
-                // Tenta fazer uma operação simples para verificar permissões
-                const testCollection = collection(db, 'convenios');
-                await getDocs(testCollection);
-                log('✅ Regras de leitura: OK', 'success');
-                
-                // Tenta adicionar um documento de teste
-                const testDoc = {
-                    teste: true,
-                    timestamp: new Date()
-                };
-                const docRef = await addDoc(testCollection, testDoc);
-                log('✅ Regras de escrita: OK', 'success');
-                
-                // Remove o documento de teste
-                await deleteDoc(docRef);
-                log('✅ Regras de exclusão: OK', 'success');
-                
-                alert('✅ Todas as regras de segurança estão funcionando!');
-            } catch (error) {
-                log(`❌ Erro nas regras: ${error.message}`, 'error');
-                log(`🔍 Código: ${error.code}`, 'error');
-                
-                if (error.code === 'permission-denied') {
-                    log('🚨 PROBLEMA: Regras de segurança bloqueando acesso!', 'error');
-                    alert('🚨 PROBLEMA ENCONTRADO!\n\nAs regras do Firestore estão bloqueando o acesso.\n\nVá no Console Firebase → Firestore Database → Regras\ne configure as regras de segurança.');
-                } else {
-                    alert('❌ Erro ao verificar regras - veja o log');
-                }
-            }
-        }
-
-        window.limparLog = function() {
-            debugLog.innerHTML = '<div class="log-entry log-info">📋 Log limpo</div>';
         }
 
         // Calcular dias restantes
@@ -978,10 +1163,14 @@
         document.getElementById('convenioForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
+            // Verificar permissão
+            if (!currentUser || currentUser.role !== 'admin') {
+                alert('❌ Acesso negado! Você precisa estar logado como administrador.');
+                return;
+            }
+            
             submitBtn.disabled = true;
             submitBtn.innerHTML = '⏳ Salvando...';
-            log('📝 Formulário enviado...', 'info');
-            log(`🔍 EditandoId atual: ${editandoId || 'null (novo convênio)'}`, 'info');
             
             const formData = new FormData(e.target);
             const convenio = {
@@ -993,21 +1182,17 @@
                 dataFim: formData.get('dataFim'),
                 objeto: formData.get('objeto'),
                 observacoes: formData.get('observacoes'),
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
+                criadoPor: currentUser.name
             };
 
-            log(`📄 Dados do convênio: ${JSON.stringify(convenio, null, 2)}`, 'info');
-
-            // FORÇAR CRIAÇÃO DE NOVO DOCUMENTO SEMPRE
             if (!editandoId) {
-                log('🆕 CRIANDO NOVO DOCUMENTO (não é edição)', 'info');
+                // Criar novo
                 try {
                     const docRef = await addDoc(collection(db, 'convenios'), convenio);
-                    log(`✅ SUCESSO! Documento criado com ID: ${docRef.id}`, 'success');
+                    console.log('Documento criado:', docRef.id);
                 } catch (error) {
-                    log(`❌ Erro ao criar documento: ${error.message}`, 'error');
-                    log(`🔍 Código: ${error.code}`, 'error');
-                    
+                    console.error('Erro ao criar:', error);
                     // Fallback local
                     convenio.id = Date.now().toString();
                     convenios.push(convenio);
@@ -1016,7 +1201,7 @@
                     atualizarEstatisticas();
                 }
             } else {
-                // Só tenta atualizar se realmente estiver editando
+                // Atualizar existente
                 const sucesso = await salvarNoFirebase(convenio);
                 if (!sucesso) {
                     // Fallback para edição
@@ -1034,7 +1219,6 @@
             submitBtn.disabled = false;
             submitBtn.innerHTML = '➕ Adicionar Convênio';
             e.target.reset();
-            log('✅ Formulário processado com sucesso!', 'success');
         });
 
         // Renderizar tabela
@@ -1049,9 +1233,10 @@
             );
 
             if (conveniosFiltrados.length === 0) {
+                const colspan = currentUser && currentUser.role === 'admin' ? '9' : '8';
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="9" class="empty-state">
+                        <td colspan="${colspan}" class="empty-state">
                             <h3>${searchTerm ? 'Nenhum resultado encontrado' : 'Nenhum convênio cadastrado'}</h3>
                             <p>${searchTerm ? 'Tente alterar os termos de busca' : 'Adicione o primeiro convênio usando o formulário acima'}</p>
                         </td>
@@ -1082,6 +1267,20 @@
                     diasClass = 'days-warning';
                 }
 
+                // Coluna de ações só aparece para admins
+                const acoesColumn = currentUser && currentUser.role === 'admin' ? `
+                    <td class="admin-only visible">
+                        <div class="action-buttons">
+                            <button class="btn btn-small" onclick="editarConvenio('${convenio.id}')" title="Editar">
+                                ✏️
+                            </button>
+                            <button class="btn btn-small btn-danger" onclick="excluirConvenio('${convenio.id}')" title="Excluir">
+                                🗑️
+                            </button>
+                        </div>
+                    </td>
+                ` : '';
+
                 return `
                     <tr>
                         <td><strong>${convenio.numero}</strong></td>
@@ -1097,16 +1296,7 @@
                             </span>
                         </td>
                         <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn btn-small" onclick="editarConvenio('${convenio.id}')" title="Editar">
-                                    ✏️
-                                </button>
-                                <button class="btn btn-small btn-danger" onclick="excluirConvenio('${convenio.id}')" title="Excluir">
-                                    🗑️
-                                </button>
-                            </div>
-                        </td>
+                        ${acoesColumn}
                     </tr>
                 `;
             }).join('');
@@ -1136,11 +1326,15 @@
 
         // Editar convênio
         window.editarConvenio = function(id) {
+            if (!currentUser || currentUser.role !== 'admin') {
+                alert('❌ Acesso negado! Você precisa estar logado como administrador.');
+                return;
+            }
+
             const convenio = convenios.find(c => c.id === id);
             if (!convenio) return;
 
             editandoId = id;
-            log(`✏️ Editando convênio: ${convenio.numero}`, 'info');
             
             document.getElementById('numero').value = convenio.numero;
             document.getElementById('organizacao').value = convenio.organizacao;
@@ -1159,13 +1353,16 @@
 
         // Excluir convênio
         window.excluirConvenio = async function(id) {
+            if (!currentUser || currentUser.role !== 'admin') {
+                alert('❌ Acesso negado! Você precisa estar logado como administrador.');
+                return;
+            }
+
             if (!confirm('Tem certeza que deseja excluir este convênio?')) return;
             
-            log(`🗑️ Excluindo convênio: ${id}`, 'info');
             const sucesso = await excluirDoFirebase(id);
             
             if (!sucesso) {
-                log('⚠️ Fallback: Excluindo localmente...', 'info');
                 // Fallback para exclusão local
                 convenios = convenios.filter(c => c.id !== id);
                 salvarLocalmente();
@@ -1180,8 +1377,6 @@
                 alert('Não há dados para exportar!');
                 return;
             }
-
-            log(`📊 Exportando ${convenios.length} convênios para CSV...`, 'info');
 
             const headers = [
                 'Número', 'Organização', 'Tipo', 'Valor', 'Data Início', 
@@ -1222,8 +1417,6 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-
-            log('✅ CSV exportado com sucesso!', 'success');
         }
 
         // Pesquisa
