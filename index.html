@@ -861,13 +861,23 @@
                 timestamp: new Date().toISOString()
             };
 
+            log(`📄 Dados do teste: ${JSON.stringify(convenioTeste, null, 2)}`, 'info');
+
             try {
+                log('🚀 Chamando addDoc diretamente...', 'info');
                 const docRef = await addDoc(collection(db, 'convenios'), convenioTeste);
-                log(`✅ Convênio teste criado com ID: ${docRef.id}`, 'success');
-                alert('✅ Convênio teste adicionado com sucesso!');
+                log(`✅ SUCESSO! Convênio teste criado com ID: ${docRef.id}`, 'success');
+                log(`🔗 Verifique no Firebase Console agora!`, 'success');
+                alert('✅ Convênio teste adicionado com sucesso!\n\nVerifique o Firebase Console - deve aparecer a coleção "convenios"');
             } catch (error) {
                 log(`❌ Erro ao adicionar teste: ${error.message}`, 'error');
-                alert('❌ Erro ao adicionar teste - veja o log');
+                log(`🔍 Código: ${error.code}`, 'error');
+                
+                if (error.code === 'permission-denied') {
+                    alert('🚨 ERRO DE PERMISSÃO!\n\nVocê precisa configurar as regras do Firestore:\n\n1. Vá no Firebase Console\n2. Firestore Database → Regras\n3. Configure as regras de segurança');
+                } else {
+                    alert('❌ Erro ao adicionar teste - veja o log para detalhes');
+                }
             }
         }
 
@@ -986,29 +996,38 @@
                 timestamp: new Date().toISOString()
             };
 
-            // Só adiciona ID se for novo convênio
-            if (!editandoId) {
-                convenio.id = Date.now().toString();
-            }
-
             log(`📄 Dados do convênio: ${JSON.stringify(convenio, null, 2)}`, 'info');
 
-            const sucesso = await salvarNoFirebase(convenio);
-            
-            if (!sucesso) {
-                log('⚠️ Fallback: Salvando localmente...', 'info');
-                // Fallback para armazenamento local
-                if (editandoId) {
+            // FORÇAR CRIAÇÃO DE NOVO DOCUMENTO SEMPRE
+            if (!editandoId) {
+                log('🆕 CRIANDO NOVO DOCUMENTO (não é edição)', 'info');
+                try {
+                    const docRef = await addDoc(collection(db, 'convenios'), convenio);
+                    log(`✅ SUCESSO! Documento criado com ID: ${docRef.id}`, 'success');
+                } catch (error) {
+                    log(`❌ Erro ao criar documento: ${error.message}`, 'error');
+                    log(`🔍 Código: ${error.code}`, 'error');
+                    
+                    // Fallback local
+                    convenio.id = Date.now().toString();
+                    convenios.push(convenio);
+                    salvarLocalmente();
+                    renderizarTabela();
+                    atualizarEstatisticas();
+                }
+            } else {
+                // Só tenta atualizar se realmente estiver editando
+                const sucesso = await salvarNoFirebase(convenio);
+                if (!sucesso) {
+                    // Fallback para edição
                     const index = convenios.findIndex(c => c.id === editandoId);
                     if (index !== -1) {
                         convenios[index] = { ...convenio, id: editandoId };
+                        salvarLocalmente();
+                        renderizarTabela();
+                        atualizarEstatisticas();
                     }
-                } else {
-                    convenios.push(convenio);
                 }
-                salvarLocalmente();
-                renderizarTabela();
-                atualizarEstatisticas();
             }
 
             editandoId = null;
