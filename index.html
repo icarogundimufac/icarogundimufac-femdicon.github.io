@@ -791,14 +791,17 @@
             try {
                 log(`💾 Tentando salvar no Firebase: ${convenio.numero}`, 'info');
                 
-                if (convenio.id && typeof convenio.id === 'string' && convenio.id.length > 10) {
-                    // Atualizar existente
-                    log(`✏️ Atualizando documento existente: ${convenio.id}`, 'info');
-                    const convenioRef = doc(db, 'convenios', convenio.id);
-                    await updateDoc(convenioRef, convenio);
+                // Verificar se é edição (editandoId existe e é um ID do Firebase)
+                if (editandoId && editandoId.length > 15) {
+                    // Atualizar existente - só se editandoId for um ID real do Firebase
+                    log(`✏️ Atualizando documento existente: ${editandoId}`, 'info');
+                    const convenioData = { ...convenio };
+                    delete convenioData.id; // Remove o ID local
+                    const convenioRef = doc(db, 'convenios', editandoId);
+                    await updateDoc(convenioRef, convenioData);
                     log(`✅ Documento atualizado com sucesso!`, 'success');
                 } else {
-                    // Criar novo
+                    // Criar novo - sempre criar quando não estiver editando
                     log(`➕ Criando novo documento...`, 'info');
                     const convenioData = { ...convenio };
                     delete convenioData.id; // Remove o ID temporário
@@ -968,10 +971,10 @@
             submitBtn.disabled = true;
             submitBtn.innerHTML = '⏳ Salvando...';
             log('📝 Formulário enviado...', 'info');
+            log(`🔍 EditandoId atual: ${editandoId || 'null (novo convênio)'}`, 'info');
             
             const formData = new FormData(e.target);
             const convenio = {
-                id: editandoId || Date.now().toString(),
                 numero: formData.get('numero'),
                 organizacao: formData.get('organizacao'),
                 tipo: formData.get('tipo'),
@@ -983,6 +986,11 @@
                 timestamp: new Date().toISOString()
             };
 
+            // Só adiciona ID se for novo convênio
+            if (!editandoId) {
+                convenio.id = Date.now().toString();
+            }
+
             log(`📄 Dados do convênio: ${JSON.stringify(convenio, null, 2)}`, 'info');
 
             const sucesso = await salvarNoFirebase(convenio);
@@ -992,7 +1000,9 @@
                 // Fallback para armazenamento local
                 if (editandoId) {
                     const index = convenios.findIndex(c => c.id === editandoId);
-                    convenios[index] = convenio;
+                    if (index !== -1) {
+                        convenios[index] = { ...convenio, id: editandoId };
+                    }
                 } else {
                     convenios.push(convenio);
                 }
