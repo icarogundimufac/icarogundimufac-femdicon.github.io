@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acompanhamento de Convênios e Instrumentos de Repasse</title>
+    <title>Acompanhamento de Convênios e Instrumentos de Repasse - Debug</title>
     <style>
         * {
             margin: 0;
@@ -54,6 +54,7 @@
             font-size: 0.85em;
             font-weight: 600;
             z-index: 1000;
+            max-width: 250px;
         }
 
         .status-online {
@@ -66,6 +67,64 @@
             background: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
+        }
+
+        .debug-panel {
+            background: #2c3e50;
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            font-family: 'Courier New', monospace;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .debug-panel h3 {
+            color: #3498db;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .debug-log {
+            max-height: 300px;
+            overflow-y: auto;
+            background: #34495e;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .log-entry {
+            margin-bottom: 8px;
+            padding: 8px;
+            border-left: 4px solid #3498db;
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .log-success {
+            border-color: #27ae60;
+            background: rgba(39, 174, 96, 0.1);
+            color: #2ecc71;
+        }
+
+        .log-error {
+            border-color: #e74c3c;
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+
+        .log-info {
+            border-color: #f39c12;
+            background: rgba(243, 156, 18, 0.1);
+            color: #f39c12;
+        }
+
+        .debug-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
         .loading {
@@ -193,6 +252,15 @@
         .btn-export:hover {
             background: linear-gradient(135deg, #229954, #1e8449);
             box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+        }
+
+        .btn-warning:hover {
+            background: linear-gradient(135deg, #e67e22, #d35400);
+            box-shadow: 0 5px 15px rgba(243, 156, 18, 0.3);
         }
 
         .button-group {
@@ -417,7 +485,7 @@
                 min-width: auto;
             }
             
-            .button-group {
+            .button-group, .debug-buttons {
                 justify-content: center;
             }
             
@@ -436,6 +504,7 @@
                 right: auto;
                 margin-bottom: 15px;
                 display: inline-block;
+                max-width: none;
             }
         }
     </style>
@@ -449,6 +518,22 @@
         <div class="header">
             <h1>🏛️ Sistema de Acompanhamento de Convênios</h1>
             <p>Gestão e controle de instrumentos de repasse com organizações da sociedade civil</p>
+            <p style="color: #e74c3c; margin-top: 10px; font-weight: 600;">📋 VERSÃO DEBUG - Diagnóstico Firebase</p>
+        </div>
+
+        <!-- Painel de Debug -->
+        <div class="debug-panel">
+            <h3>🔧 Painel de Debug Firebase</h3>
+            <div id="debugLog" class="debug-log">
+                <div class="log-entry log-info">🚀 Sistema iniciando...</div>
+            </div>
+            <div class="debug-buttons">
+                <button class="btn btn-warning" onclick="testarConexao()">🔧 Testar Conexão</button>
+                <button class="btn btn-export" onclick="adicionarTeste()">➕ Adicionar Teste</button>
+                <button class="btn" onclick="listarTodos()">📋 Listar Firebase</button>
+                <button class="btn btn-danger" onclick="limparLog()">🗑️ Limpar Log</button>
+                <button class="btn" onclick="verificarRegras()">⚙️ Verificar Regras</button>
+            </div>
         </div>
 
         <div id="loadingSection" class="loading">
@@ -587,9 +672,6 @@
             measurementId: "G-L24NPHVJSH"
         };
 
-        // Verificar se Firebase está configurado
-        const isFirebaseConfigured = true; // Agora está configurado!
-
         let app, db;
         let convenios = [];
         let editandoId = null;
@@ -599,43 +681,74 @@
         const mainContent = document.getElementById('mainContent');
         const connectionStatus = document.getElementById('connectionStatus');
         const submitBtn = document.getElementById('submitBtn');
+        const debugLog = document.getElementById('debugLog');
+
+        // Debug log
+        function log(message, type = 'info') {
+            const time = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            entry.innerHTML = `[${time}] ${message}`;
+            debugLog.appendChild(entry);
+            debugLog.scrollTop = debugLog.scrollHeight;
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        // Atualizar status de conexão
+        function atualizarStatus(status, details = '') {
+            const statusElement = connectionStatus;
+            
+            if (status === 'online') {
+                statusElement.textContent = `🟢 Online - ${details || 'Dados sincronizados'}`;
+                statusElement.className = 'connection-status status-online';
+            } else {
+                statusElement.textContent = `🔴 Offline - ${details || 'Erro de conexão'}`;
+                statusElement.className = 'connection-status status-offline';
+            }
+        }
 
         // Inicializar aplicação
         async function inicializar() {
-            if (isFirebaseConfigured) {
-                try {
-                    app = initializeApp(firebaseConfig);
-                    db = getFirestore(app);
-                    
-                    // Escutar mudanças em tempo real
-                    const conveniosRef = collection(db, 'convenios');
-                    onSnapshot(conveniosRef, (snapshot) => {
-                        convenios = [];
-                        snapshot.forEach((doc) => {
-                            convenios.push({
-                                id: doc.id,
-                                ...doc.data()
-                            });
+            try {
+                log('🚀 Inicializando Firebase...', 'info');
+                log(`📡 Projeto: ${firebaseConfig.projectId}`, 'info');
+                
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                
+                log('✅ Firebase inicializado com sucesso!', 'success');
+                
+                // Teste de conexão inicial
+                await testarConexaoSilencioso();
+                
+                // Escutar mudanças em tempo real
+                const conveniosRef = collection(db, 'convenios');
+                log('📡 Configurando listener em tempo real...', 'info');
+                
+                onSnapshot(conveniosRef, (snapshot) => {
+                    log(`📥 Recebidos ${snapshot.size} documentos do Firebase`, 'success');
+                    convenios = [];
+                    snapshot.forEach((doc) => {
+                        convenios.push({
+                            id: doc.id,
+                            ...doc.data()
                         });
-                        renderizarTabela();
-                        atualizarEstatisticas();
-                        atualizarStatus('online');
-                    }, (error) => {
-                        console.error("Erro ao escutar mudanças:", error);
-                        atualizarStatus('offline');
-                        carregarDadosLocais(); // Fallback para dados locais
+                        log(`📄 Documento carregado: ${doc.id}`, 'info');
                     });
+                    renderizarTabela();
+                    atualizarEstatisticas();
+                    atualizarStatus('online', `${convenios.length} convênios carregados`);
+                }, (error) => {
+                    log(`❌ Erro ao escutar mudanças: ${error.message}`, 'error');
+                    log(`🔍 Código do erro: ${error.code}`, 'error');
+                    atualizarStatus('offline', error.message);
+                    carregarDadosLocais(); // Fallback para dados locais
+                });
 
-                    atualizarStatus('online');
-                } catch (error) {
-                    console.error("Erro ao conectar Firebase:", error);
-                    atualizarStatus('offline');
-                    carregarDadosLocais();
-                }
-            } else {
-                // Modo local se Firebase não configurado
-                console.log("Firebase não configurado, usando armazenamento local");
-                atualizarStatus('local');
+            } catch (error) {
+                log(`❌ Erro ao inicializar Firebase: ${error.message}`, 'error');
+                log(`🔍 Código do erro: ${error.code}`, 'error');
+                atualizarStatus('offline', error.message);
                 carregarDadosLocais();
             }
 
@@ -644,62 +757,72 @@
             mainContent.style.display = 'block';
         }
 
-        // Atualizar status de conexão
-        function atualizarStatus(status) {
-            const statusElement = connectionStatus;
-            
-            if (status === 'online') {
-                statusElement.textContent = '🟢 Online - Dados sincronizados';
-                statusElement.className = 'connection-status status-online';
-            } else if (status === 'local') {
-                statusElement.textContent = '🟡 Modo Local - Configure Firebase para sincronizar';
-                statusElement.className = 'connection-status status-offline';
-            } else {
-                statusElement.textContent = '🔴 Offline - Usando dados locais';
-                statusElement.className = 'connection-status status-offline';
+        // Testar conexão (silencioso)
+        async function testarConexaoSilencioso() {
+            try {
+                log('🔍 Testando conexão com Firestore...', 'info');
+                const testCollection = collection(db, 'convenios');
+                const snapshot = await getDocs(testCollection);
+                log(`✅ Conexão OK - ${snapshot.size} documentos encontrados`, 'success');
+                return true;
+            } catch (error) {
+                log(`❌ Erro na conexão: ${error.message}`, 'error');
+                log(`🔍 Código: ${error.code}`, 'error');
+                return false;
             }
         }
 
         // Carregar dados do localStorage como fallback
         function carregarDadosLocais() {
+            log('💾 Carregando dados locais...', 'info');
             const dadosSalvos = localStorage.getItem('convenios');
             if (dadosSalvos) {
                 convenios = JSON.parse(dadosSalvos);
+                log(`💾 ${convenios.length} convênios carregados do localStorage`, 'success');
                 renderizarTabela();
                 atualizarEstatisticas();
+            } else {
+                log('💾 Nenhum dado local encontrado', 'info');
             }
         }
 
         // Salvar no Firebase
         async function salvarNoFirebase(convenio) {
-            if (!isFirebaseConfigured || !db) return false;
-            
             try {
-                if (convenio.id && typeof convenio.id === 'string') {
+                log(`💾 Tentando salvar no Firebase: ${convenio.numero}`, 'info');
+                
+                if (convenio.id && typeof convenio.id === 'string' && convenio.id.length > 10) {
                     // Atualizar existente
+                    log(`✏️ Atualizando documento existente: ${convenio.id}`, 'info');
                     const convenioRef = doc(db, 'convenios', convenio.id);
                     await updateDoc(convenioRef, convenio);
+                    log(`✅ Documento atualizado com sucesso!`, 'success');
                 } else {
                     // Criar novo
-                    delete convenio.id; // Remove o ID temporário
-                    await addDoc(collection(db, 'convenios'), convenio);
+                    log(`➕ Criando novo documento...`, 'info');
+                    const convenioData = { ...convenio };
+                    delete convenioData.id; // Remove o ID temporário
+                    const docRef = await addDoc(collection(db, 'convenios'), convenioData);
+                    log(`✅ Documento criado com ID: ${docRef.id}`, 'success');
                 }
                 return true;
             } catch (error) {
-                console.error("Erro ao salvar:", error);
+                log(`❌ Erro ao salvar: ${error.message}`, 'error');
+                log(`🔍 Código: ${error.code}`, 'error');
                 return false;
             }
         }
 
         // Excluir do Firebase
         async function excluirDoFirebase(id) {
-            if (!isFirebaseConfigured || !db) return false;
-            
             try {
+                log(`🗑️ Tentando excluir documento: ${id}`, 'info');
                 await deleteDoc(doc(db, 'convenios', id));
+                log(`✅ Documento excluído com sucesso!`, 'success');
                 return true;
             } catch (error) {
-                console.error("Erro ao excluir:", error);
+                log(`❌ Erro ao excluir: ${error.message}`, 'error');
+                log(`🔍 Código: ${error.code}`, 'error');
                 return false;
             }
         }
@@ -707,6 +830,104 @@
         // Salvar localmente como backup
         function salvarLocalmente() {
             localStorage.setItem('convenios', JSON.stringify(convenios));
+            log(`💾 Dados salvos localmente (${convenios.length} convênios)`, 'info');
+        }
+
+        // Funções de teste debug
+        window.testarConexao = async function() {
+            log('🔧 Teste manual de conexão iniciado...', 'info');
+            const sucesso = await testarConexaoSilencioso();
+            if (sucesso) {
+                alert('✅ Conexão Firebase funcionando!');
+            } else {
+                alert('❌ Erro na conexão - verifique o log');
+            }
+        }
+
+        window.adicionarTeste = async function() {
+            log('➕ Adicionando convênio teste...', 'info');
+            const convenioTeste = {
+                numero: `TESTE-${Date.now()}`,
+                organizacao: 'Organização de Teste',
+                tipo: 'Convênio',
+                valor: 50000,
+                dataInicio: '2024-01-01',
+                dataFim: '2024-12-31',
+                objeto: 'Convênio de teste para validar conexão',
+                observacoes: 'Criado automaticamente pelo sistema de debug',
+                timestamp: new Date().toISOString()
+            };
+
+            try {
+                const docRef = await addDoc(collection(db, 'convenios'), convenioTeste);
+                log(`✅ Convênio teste criado com ID: ${docRef.id}`, 'success');
+                alert('✅ Convênio teste adicionado com sucesso!');
+            } catch (error) {
+                log(`❌ Erro ao adicionar teste: ${error.message}`, 'error');
+                alert('❌ Erro ao adicionar teste - veja o log');
+            }
+        }
+
+        window.listarTodos = async function() {
+            log('📋 Listando todos os documentos do Firebase...', 'info');
+            try {
+                const querySnapshot = await getDocs(collection(db, 'convenios'));
+                log(`📋 Total de documentos encontrados: ${querySnapshot.size}`, 'success');
+                
+                if (querySnapshot.size === 0) {
+                    log('📄 Nenhum documento encontrado na coleção', 'info');
+                } else {
+                    querySnapshot.forEach((doc, index) => {
+                        const data = doc.data();
+                        log(`📄 Doc ${index + 1} - ID: ${doc.id}`, 'info');
+                        log(`📄 Dados: ${JSON.stringify(data, null, 2)}`, 'info');
+                    });
+                }
+                
+                alert(`📋 ${querySnapshot.size} documentos listados no log`);
+            } catch (error) {
+                log(`❌ Erro ao listar documentos: ${error.message}`, 'error');
+                log(`🔍 Código: ${error.code}`, 'error');
+                alert('❌ Erro ao listar - veja o log');
+            }
+        }
+
+        window.verificarRegras = async function() {
+            log('⚙️ Verificando regras de segurança...', 'info');
+            try {
+                // Tenta fazer uma operação simples para verificar permissões
+                const testCollection = collection(db, 'convenios');
+                await getDocs(testCollection);
+                log('✅ Regras de leitura: OK', 'success');
+                
+                // Tenta adicionar um documento de teste
+                const testDoc = {
+                    teste: true,
+                    timestamp: new Date()
+                };
+                const docRef = await addDoc(testCollection, testDoc);
+                log('✅ Regras de escrita: OK', 'success');
+                
+                // Remove o documento de teste
+                await deleteDoc(docRef);
+                log('✅ Regras de exclusão: OK', 'success');
+                
+                alert('✅ Todas as regras de segurança estão funcionando!');
+            } catch (error) {
+                log(`❌ Erro nas regras: ${error.message}`, 'error');
+                log(`🔍 Código: ${error.code}`, 'error');
+                
+                if (error.code === 'permission-denied') {
+                    log('🚨 PROBLEMA: Regras de segurança bloqueando acesso!', 'error');
+                    alert('🚨 PROBLEMA ENCONTRADO!\n\nAs regras do Firestore estão bloqueando o acesso.\n\nVá no Console Firebase → Firestore Database → Regras\ne configure as regras de segurança.');
+                } else {
+                    alert('❌ Erro ao verificar regras - veja o log');
+                }
+            }
+        }
+
+        window.limparLog = function() {
+            debugLog.innerHTML = '<div class="log-entry log-info">📋 Log limpo</div>';
         }
 
         // Calcular dias restantes
@@ -746,6 +967,7 @@
             
             submitBtn.disabled = true;
             submitBtn.innerHTML = '⏳ Salvando...';
+            log('📝 Formulário enviado...', 'info');
             
             const formData = new FormData(e.target);
             const convenio = {
@@ -757,12 +979,16 @@
                 dataInicio: formData.get('dataInicio'),
                 dataFim: formData.get('dataFim'),
                 objeto: formData.get('objeto'),
-                observacoes: formData.get('observacoes')
+                observacoes: formData.get('observacoes'),
+                timestamp: new Date().toISOString()
             };
+
+            log(`📄 Dados do convênio: ${JSON.stringify(convenio, null, 2)}`, 'info');
 
             const sucesso = await salvarNoFirebase(convenio);
             
             if (!sucesso) {
+                log('⚠️ Fallback: Salvando localmente...', 'info');
                 // Fallback para armazenamento local
                 if (editandoId) {
                     const index = convenios.findIndex(c => c.id === editandoId);
@@ -779,6 +1005,7 @@
             submitBtn.disabled = false;
             submitBtn.innerHTML = '➕ Adicionar Convênio';
             e.target.reset();
+            log('✅ Formulário processado com sucesso!', 'success');
         });
 
         // Renderizar tabela
@@ -884,6 +1111,7 @@
             if (!convenio) return;
 
             editandoId = id;
+            log(`✏️ Editando convênio: ${convenio.numero}`, 'info');
             
             document.getElementById('numero').value = convenio.numero;
             document.getElementById('organizacao').value = convenio.organizacao;
@@ -904,9 +1132,11 @@
         window.excluirConvenio = async function(id) {
             if (!confirm('Tem certeza que deseja excluir este convênio?')) return;
             
+            log(`🗑️ Excluindo convênio: ${id}`, 'info');
             const sucesso = await excluirDoFirebase(id);
             
             if (!sucesso) {
+                log('⚠️ Fallback: Excluindo localmente...', 'info');
                 // Fallback para exclusão local
                 convenios = convenios.filter(c => c.id !== id);
                 salvarLocalmente();
@@ -921,6 +1151,8 @@
                 alert('Não há dados para exportar!');
                 return;
             }
+
+            log(`📊 Exportando ${convenios.length} convênios para CSV...`, 'info');
 
             const headers = [
                 'Número', 'Organização', 'Tipo', 'Valor', 'Data Início', 
@@ -961,6 +1193,8 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+
+            log('✅ CSV exportado com sucesso!', 'success');
         }
 
         // Pesquisa
@@ -971,5 +1205,3 @@
     </script>
 </body>
 </html>
-
-        //
