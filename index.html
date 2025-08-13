@@ -45,8 +45,8 @@
             font-size: 1.1em;
         }
 
-        /* ESTILOS DE LOGIN */
-        .login-overlay {
+        /* ESTILO PARA PROMPT DE SENHA */
+        .password-prompt {
             position: fixed;
             top: 0;
             left: 0;
@@ -54,23 +54,23 @@
             height: 100%;
             background: rgba(0, 0, 0, 0.8);
             backdrop-filter: blur(5px);
-            display: flex;
+            display: none;
             justify-content: center;
             align-items: center;
             z-index: 9999;
         }
 
-        .login-modal {
+        .password-modal {
             background: white;
             border-radius: 20px;
             padding: 40px;
             max-width: 400px;
             width: 90%;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            animation: loginSlideIn 0.3s ease-out;
+            animation: modalSlideIn 0.3s ease-out;
         }
 
-        @keyframes loginSlideIn {
+        @keyframes modalSlideIn {
             from {
                 opacity: 0;
                 transform: translateY(-50px) scale(0.9);
@@ -81,181 +81,126 @@
             }
         }
 
-        .login-header {
+        .password-header {
             text-align: center;
             margin-bottom: 30px;
         }
 
-        .login-header h2 {
+        .password-header h3 {
             color: #2c3e50;
-            font-size: 1.8em;
+            font-size: 1.5em;
             margin-bottom: 10px;
         }
 
-        .login-header p {
+        .password-header p {
             color: #7f8c8d;
-            font-size: 1em;
-        }
-
-        .login-form {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .login-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .login-group label {
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 8px;
             font-size: 0.95em;
         }
 
-        .login-group input {
+        .password-input {
+            width: 100%;
             padding: 15px;
             border: 2px solid #e0e0e0;
             border-radius: 10px;
-            font-size: 1em;
+            font-size: 1.1em;
+            text-align: center;
+            margin-bottom: 20px;
             transition: all 0.3s ease;
-            background: #f8f9fa;
         }
 
-        .login-group input:focus {
+        .password-input:focus {
             outline: none;
             border-color: #3498db;
             box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-            background: white;
         }
 
-        .login-btn {
+        .password-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .password-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .password-btn.primary {
             background: linear-gradient(135deg, #3498db, #2980b9);
             color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 1.1em;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            margin-top: 10px;
         }
 
-        .login-btn:hover {
+        .password-btn.primary:hover {
             background: linear-gradient(135deg, #2980b9, #1f639a);
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
         }
 
-        .login-btn:disabled {
-            background: #bdc3c7;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
+        .password-btn.secondary {
+            background: #f8f9fa;
+            color: #6c757d;
+            border: 1px solid #dee2e6;
         }
 
-        .login-error {
+        .password-btn.secondary:hover {
+            background: #e9ecef;
+        }
+
+        .password-error {
             background: #f8d7da;
             color: #721c24;
-            padding: 12px;
+            padding: 10px 15px;
             border-radius: 8px;
-            border: 1px solid #f5c6cb;
-            font-size: 0.9em;
-            margin-top: 10px;
-        }
-
-        .login-info {
-            background: #d1ecf1;
-            color: #0c5460;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #bee5eb;
-            font-size: 0.9em;
             margin-top: 15px;
+            font-size: 0.9em;
+            border: 1px solid #f5c6cb;
+            display: none;
         }
 
-        .login-info strong {
-            display: block;
-            margin-bottom: 8px;
-        }
-
-        /* USER STATUS */
-        .user-status {
+        /* STATUS DE ACESSO */
+        .access-status {
             position: fixed;
             top: 20px;
             right: 20px;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 10px 20px;
-            border-radius: 25px;
-            font-size: 0.9em;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
             font-weight: 600;
             z-index: 1000;
             display: flex;
             align-items: center;
-            gap: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            gap: 8px;
         }
 
-        .user-status.guest {
+        .access-status.viewer {
             background: #fff3cd;
             color: #856404;
             border: 1px solid #ffeaa7;
         }
 
-        .user-status.admin {
+        .access-status.admin {
             background: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
         }
 
-        .logout-btn {
-            background: #e74c3c;
-            color: white;
+        .unlock-btn {
+            background: #ffc107;
+            color: #212529;
             border: none;
-            padding: 5px 12px;
-            border-radius: 15px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75em;
             cursor: pointer;
-            font-size: 0.8em;
             font-weight: 600;
         }
 
-        .logout-btn:hover {
-            background: #c0392b;
-        }
-
-        /* PROTEÇÃO DE ELEMENTOS */
-        .admin-only {
-            display: none;
-        }
-
-        .admin-only.visible {
-            display: block;
-        }
-
-        .admin-only.visible-flex {
-            display: flex;
-        }
-
-        .admin-only.visible-inline {
-            display: inline-flex;
-        }
-
-        .guest-message {
-            background: rgba(255, 243, 205, 0.95);
-            border: 1px solid #ffeaa7;
-            color: #856404;
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 25px;
-            text-align: center;
-        }
-
-        .guest-message h3 {
-            margin-bottom: 10px;
-            font-size: 1.2em;
+        .unlock-btn:hover {
+            background: #ffb300;
         }
 
         .connection-status {
@@ -267,6 +212,7 @@
             font-size: 0.85em;
             font-weight: 600;
             z-index: 1000;
+            max-width: 250px;
         }
 
         .status-online {
@@ -279,6 +225,38 @@
             background: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
+        }
+
+        /* PROTEÇÃO DE ELEMENTOS */
+        .admin-only {
+            display: none !important;
+        }
+
+        .admin-only.unlocked {
+            display: block !important;
+        }
+
+        .admin-only.unlocked-flex {
+            display: flex !important;
+        }
+
+        .admin-only.unlocked-inline {
+            display: inline-flex !important;
+        }
+
+        .visitor-message {
+            background: rgba(255, 243, 205, 0.95);
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .visitor-message h3 {
+            margin-bottom: 10px;
+            font-size: 1.2em;
         }
 
         .loading {
@@ -652,7 +630,7 @@
                 grid-template-columns: repeat(2, 1fr);
             }
 
-            .user-status {
+            .access-status {
                 position: relative;
                 top: auto;
                 right: auto;
@@ -666,9 +644,10 @@
                 right: auto;
                 margin-bottom: 15px;
                 display: inline-block;
+                max-width: none;
             }
 
-            .login-modal {
+            .password-modal {
                 padding: 30px 20px;
                 margin: 20px;
             }
@@ -676,48 +655,29 @@
     </style>
 </head>
 <body>
-    <!-- TELA DE LOGIN -->
-    <div id="loginOverlay" class="login-overlay">
-        <div class="login-modal">
-            <div class="login-header">
-                <h2>🔐 Acesso ao Sistema</h2>
-                <p>Digite suas credenciais para continuar</p>
+    <!-- PROMPT DE SENHA -->
+    <div id="passwordPrompt" class="password-prompt">
+        <div class="password-modal">
+            <div class="password-header">
+                <h3>🔐 Acesso Restrito</h3>
+                <p>Digite a senha para editar convênios</p>
             </div>
-            <form id="loginForm" class="login-form">
-                <div class="login-group">
-                    <label for="loginUsername">Usuário</label>
-                    <input type="text" id="loginUsername" required autocomplete="username">
-                </div>
-                <div class="login-group">
-                    <label for="loginPassword">Senha</label>
-                    <input type="password" id="loginPassword" required autocomplete="current-password">
-                </div>
-                <button type="submit" class="login-btn" id="loginSubmitBtn">
-                    🚀 Entrar
-                </button>
-                <div id="loginError" class="login-error" style="display: none;"></div>
-                <div class="login-info">
-                    <strong>👁️ Modo Visitante</strong>
-                    Você pode visualizar os convênios sem fazer login, mas não poderá editar ou adicionar novos registros.
-                    <br><br>
-                    <button type="button" class="btn" onclick="entrarComoVisitante()" style="width: 100%; margin-top: 10px;">
-                        👀 Continuar como Visitante
-                    </button>
-                </div>
-            </form>
+            <input type="password" id="passwordInput" class="password-input" placeholder="Digite a senha..." maxlength="20">
+            <div class="password-buttons">
+                <button class="password-btn secondary" onclick="cancelarSenha()">👀 Apenas Visualizar</button>
+                <button class="password-btn primary" onclick="verificarSenha()">🚀 Acessar</button>
+            </div>
+            <div id="passwordError" class="password-error">
+                ❌ Senha incorreta. Tente novamente.
+            </div>
         </div>
     </div>
 
     <div class="container">
-        <!-- STATUS DO USUÁRIO -->
-        <div id="userStatus" class="user-status guest">
-            <span id="userInfo">👤 Visitante</span>
-            <button id="loginBtn" class="btn" style="padding: 5px 12px; font-size: 0.8em;" onclick="mostrarLogin()">
-                🔑 Fazer Login
-            </button>
-            <button id="logoutBtn" class="logout-btn" style="display: none;" onclick="logout()">
-                🚪 Sair
-            </button>
+        <!-- STATUS DE ACESSO -->
+        <div id="accessStatus" class="access-status viewer">
+            <span>👁️ Modo Visualização</span>
+            <button class="unlock-btn" onclick="mostrarSenha()">🔓 Desbloquear</button>
         </div>
 
         <div class="connection-status" id="connectionStatus">
@@ -737,9 +697,9 @@
 
         <div id="mainContent" style="display: none;">
             <!-- MENSAGEM PARA VISITANTES -->
-            <div id="guestMessage" class="guest-message">
-                <h3>👀 Modo Visitante</h3>
-                <p>Você pode visualizar todos os convênios, mas precisa fazer login para editar ou adicionar novos registros.</p>
+            <div id="visitorMessage" class="visitor-message">
+                <h3>👀 Modo Visualização</h3>
+                <p>Você pode visualizar todos os convênios, mas precisa inserir a senha para editar ou adicionar novos registros.</p>
             </div>
 
             <!-- Estatísticas -->
@@ -762,7 +722,7 @@
                 </div>
             </div>
 
-            <!-- Formulário - APENAS PARA ADMINISTRADORES -->
+            <!-- Formulário - PROTEGIDO POR SENHA -->
             <div class="form-section admin-only">
                 <h2>📝 Cadastrar Novo Convênio/Instrumento de Repasse</h2>
                 <form id="convenioForm">
@@ -823,7 +783,7 @@
             <div class="table-section">
                 <div class="table-header">
                     <h2>📋 Lista de Convênios e Instrumentos</h2>
-                    <input type="text" id="searchBox" class="search-box" placeholder="🔍 Pesquisar por número, organização ou tipo...">
+                    <input type="text" id="searchBox" class="search-box" placeholder="🔍 Pesquisar por número, organização, tipo ou objeto...">
                 </div>
                 <div class="table-container">
                     <table id="conveniosTable">
@@ -832,6 +792,7 @@
                                 <th>Número</th>
                                 <th>Organização</th>
                                 <th>Tipo</th>
+                                <th>Objeto/Finalidade</th>
                                 <th>Valor</th>
                                 <th>Início</th>
                                 <th>Término</th>
@@ -871,151 +832,117 @@
             measurementId: "G-L24NPHVJSH"
         };
 
-        // CONFIGURAÇÕES DE LOGIN - ALTERE AQUI!
-        const loginConfig = {
-            usuarios: [
-                { username: "sueila", password: "123456789", role: "admin", name: "Administrador" },
-                { username: "conceicao", password: "123456789", role: "admin", name: "Administrador" },
-                { username: "icaro", password: "123456789", role: "admin", name: "Gestor" }
-            ]
-        };
+        // SENHA DE ACESSO
+        const SENHA_ADMIN = "Conveniosfem*";
 
         let app, db;
         let convenios = [];
         let editandoId = null;
-        let currentUser = null; // null = visitante, objeto = usuário logado
+        let isAdmin = false;
 
         // Elementos DOM
         const loadingSection = document.getElementById('loadingSection');
         const mainContent = document.getElementById('mainContent');
         const connectionStatus = document.getElementById('connectionStatus');
         const submitBtn = document.getElementById('submitBtn');
-        const loginOverlay = document.getElementById('loginOverlay');
-        const loginForm = document.getElementById('loginForm');
-        const loginError = document.getElementById('loginError');
-        const userStatus = document.getElementById('userStatus');
-        const userInfo = document.getElementById('userInfo');
-        const loginBtn = document.getElementById('loginBtn');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const guestMessage = document.getElementById('guestMessage');
+        const passwordPrompt = document.getElementById('passwordPrompt');
+        const passwordInput = document.getElementById('passwordInput');
+        const passwordError = document.getElementById('passwordError');
+        const accessStatus = document.getElementById('accessStatus');
+        const visitorMessage = document.getElementById('visitorMessage');
 
-        // SISTEMA DE LOGIN
-        function verificarLogin() {
-            const savedUser = localStorage.getItem('currentUser');
-            if (savedUser) {
-                currentUser = JSON.parse(savedUser);
-                atualizarInterfaceUsuario();
-                loginOverlay.style.display = 'none';
-            } else {
-                // Mostrar tela de login por padrão
-                loginOverlay.style.display = 'flex';
+        // SISTEMA DE SENHA
+        function verificarSessao() {
+            const adminSaved = localStorage.getItem('isAdmin');
+            if (adminSaved === 'true') {
+                isAdmin = true;
+                atualizarInterface();
             }
         }
 
-        function atualizarInterfaceUsuario() {
+        function atualizarInterface() {
             const adminElements = document.querySelectorAll('.admin-only');
             
-            if (currentUser && currentUser.role === 'admin') {
-                // Usuário logado - mostrar elementos admin
+            if (isAdmin) {
+                // Modo admin - mostrar elementos protegidos
                 adminElements.forEach(el => {
                     if (el.tagName === 'TH' || el.tagName === 'TD') {
-                        el.classList.add('visible');
+                        el.classList.add('unlocked');
                     } else if (el.style.display === 'flex' || el.classList.contains('button-group') || el.classList.contains('action-buttons')) {
-                        el.classList.add('visible-flex');
+                        el.classList.add('unlocked-flex');
                     } else if (el.tagName === 'BUTTON') {
-                        el.classList.add('visible-inline');
+                        el.classList.add('unlocked-inline');
                     } else {
-                        el.classList.add('visible');
+                        el.classList.add('unlocked');
                     }
                 });
                 
-                userStatus.className = 'user-status admin';
-                userInfo.textContent = `👤 ${currentUser.name}`;
-                loginBtn.style.display = 'none';
-                logoutBtn.style.display = 'inline-block';
-                guestMessage.style.display = 'none';
+                accessStatus.className = 'access-status admin';
+                accessStatus.innerHTML = '🔓 Modo Administrador';
+                visitorMessage.style.display = 'none';
                 
             } else {
-                // Visitante - esconder elementos admin
+                // Modo visitante - esconder elementos protegidos
                 adminElements.forEach(el => {
-                    el.classList.remove('visible', 'visible-flex', 'visible-inline');
+                    el.classList.remove('unlocked', 'unlocked-flex', 'unlocked-inline');
                 });
                 
-                userStatus.className = 'user-status guest';
-                userInfo.textContent = '👤 Visitante';
-                loginBtn.style.display = 'inline-block';
-                logoutBtn.style.display = 'none';
-                guestMessage.style.display = 'block';
+                accessStatus.className = 'access-status viewer';
+                accessStatus.innerHTML = '<span>👁️ Modo Visualização</span><button class="unlock-btn" onclick="mostrarSenha()">🔓 Desbloquear</button>';
+                visitorMessage.style.display = 'block';
             }
+            
+            // Re-renderizar tabela para atualizar colunas
+            renderizarTabela();
         }
 
-        function mostrarLogin() {
-            loginOverlay.style.display = 'flex';
-            document.getElementById('loginUsername').focus();
+        function mostrarSenha() {
+            passwordPrompt.style.display = 'flex';
+            passwordInput.focus();
+            passwordError.style.display = 'none';
         }
 
-        function entrarComoVisitante() {
-            currentUser = null;
-            localStorage.removeItem('currentUser');
-            atualizarInterfaceUsuario();
-            loginOverlay.style.display = 'none';
-        }
-
-        function logout() {
-            if (confirm('Tem certeza que deseja sair?')) {
-                currentUser = null;
-                localStorage.removeItem('currentUser');
-                atualizarInterfaceUsuario();
-                // Limpar formulário se estiver editando
-                if (editandoId) {
-                    document.getElementById('convenioForm').reset();
-                    editandoId = null;
-                    if (submitBtn) {
-                        submitBtn.innerHTML = '➕ Adicionar Convênio';
-                    }
+        function verificarSenha() {
+            const senha = passwordInput.value;
+            
+            if (senha === SENHA_ADMIN) {
+                isAdmin = true;
+                localStorage.setItem('isAdmin', 'true');
+                passwordPrompt.style.display = 'none';
+                passwordInput.value = '';
+                passwordError.style.display = 'none';
+                atualizarInterface();
+            } else {
+                passwordError.style.display = 'block';
+                passwordInput.value = '';
+                passwordInput.focus();
+                
+                // Vibrar se suportado
+                if (navigator.vibrate) {
+                    navigator.vibrate(200);
                 }
             }
         }
 
-        // Fazer login disponível globalmente
-        window.mostrarLogin = mostrarLogin;
-        window.entrarComoVisitante = entrarComoVisitante;
-        window.logout = logout;
+        function cancelarSenha() {
+            isAdmin = false;
+            localStorage.setItem('isAdmin', 'false');
+            passwordPrompt.style.display = 'none';
+            passwordInput.value = '';
+            passwordError.style.display = 'none';
+            atualizarInterface();
+        }
 
-        // Form de login
-        loginForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const username = document.getElementById('loginUsername').value;
-            const password = document.getElementById('loginPassword').value;
-            const submitBtn = document.getElementById('loginSubmitBtn');
-            
-            submitBtn.disabled = true;
-            submitBtn.textContent = '🔄 Verificando...';
-            
-            // Simular delay de autenticação
-            setTimeout(() => {
-                const usuario = loginConfig.usuarios.find(u => 
-                    u.username === username && u.password === password
-                );
-                
-                if (usuario) {
-                    currentUser = usuario;
-                    localStorage.setItem('currentUser', JSON.stringify(usuario));
-                    atualizarInterfaceUsuario();
-                    loginOverlay.style.display = 'none';
-                    loginError.style.display = 'none';
-                    loginForm.reset();
-                } else {
-                    loginError.textContent = '❌ Usuário ou senha incorretos';
-                    loginError.style.display = 'block';
-                    document.getElementById('loginPassword').value = '';
-                    document.getElementById('loginPassword').focus();
-                }
-                
-                submitBtn.disabled = false;
-                submitBtn.textContent = '🚀 Entrar';
-            }, 1000);
+        // Fazer funções disponíveis globalmente
+        window.mostrarSenha = mostrarSenha;
+        window.verificarSenha = verificarSenha;
+        window.cancelarSenha = cancelarSenha;
+
+        // Enter no campo de senha
+        passwordInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                verificarSenha();
+            }
         });
 
         // Atualizar status de conexão
@@ -1053,7 +980,7 @@
                 }, (error) => {
                     console.error("Erro ao escutar mudanças:", error);
                     atualizarStatus('offline', error.message);
-                    carregarDadosLocais(); // Fallback para dados locais
+                    carregarDadosLocais();
                 });
 
             } catch (error) {
@@ -1066,8 +993,8 @@
             loadingSection.style.display = 'none';
             mainContent.style.display = 'block';
             
-            // Verificar login após carregar
-            verificarLogin();
+            // Verificar sessão admin
+            verificarSessao();
         }
 
         // Carregar dados do localStorage como fallback
@@ -1082,8 +1009,9 @@
 
         // Salvar no Firebase
         async function salvarNoFirebase(convenio) {
-            if (!currentUser || currentUser.role !== 'admin') {
-                alert('❌ Acesso negado! Você precisa estar logado como administrador.');
+            if (!isAdmin) {
+                alert('❌ Acesso negado! Digite a senha para editar convênios.');
+                mostrarSenha();
                 return false;
             }
 
@@ -1109,8 +1037,9 @@
 
         // Excluir do Firebase
         async function excluirDoFirebase(id) {
-            if (!currentUser || currentUser.role !== 'admin') {
-                alert('❌ Acesso negado! Você precisa estar logado como administrador.');
+            if (!isAdmin) {
+                alert('❌ Acesso negado! Digite a senha para editar convênios.');
+                mostrarSenha();
                 return false;
             }
             
@@ -1164,8 +1093,9 @@
             e.preventDefault();
             
             // Verificar permissão
-            if (!currentUser || currentUser.role !== 'admin') {
-                alert('❌ Acesso negado! Você precisa estar logado como administrador.');
+            if (!isAdmin) {
+                alert('❌ Acesso negado! Digite a senha para editar convênios.');
+                mostrarSenha();
                 return;
             }
             
@@ -1182,8 +1112,7 @@
                 dataFim: formData.get('dataFim'),
                 objeto: formData.get('objeto'),
                 observacoes: formData.get('observacoes'),
-                timestamp: new Date().toISOString(),
-                criadoPor: currentUser.name
+                timestamp: new Date().toISOString()
             };
 
             if (!editandoId) {
@@ -1229,11 +1158,12 @@
             let conveniosFiltrados = convenios.filter(c => 
                 c.numero.toLowerCase().includes(searchTerm) ||
                 c.organizacao.toLowerCase().includes(searchTerm) ||
-                c.tipo.toLowerCase().includes(searchTerm)
+                c.tipo.toLowerCase().includes(searchTerm) ||
+                (c.objeto && c.objeto.toLowerCase().includes(searchTerm))
             );
 
             if (conveniosFiltrados.length === 0) {
-                const colspan = currentUser && currentUser.role === 'admin' ? '9' : '8';
+                const colspan = isAdmin ? '10' : '9';
                 tbody.innerHTML = `
                     <tr>
                         <td colspan="${colspan}" class="empty-state">
@@ -1268,8 +1198,8 @@
                 }
 
                 // Coluna de ações só aparece para admins
-                const acoesColumn = currentUser && currentUser.role === 'admin' ? `
-                    <td class="admin-only visible">
+                const acoesColumn = isAdmin ? `
+                    <td class="admin-only unlocked">
                         <div class="action-buttons">
                             <button class="btn btn-small" onclick="editarConvenio('${convenio.id}')" title="Editar">
                                 ✏️
@@ -1286,6 +1216,7 @@
                         <td><strong>${convenio.numero}</strong></td>
                         <td>${convenio.organizacao}</td>
                         <td>${convenio.tipo}</td>
+                        <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${convenio.objeto || 'Não informado'}">${convenio.objeto || 'Não informado'}</td>
                         <td>${formatarValor(convenio.valor)}</td>
                         <td>${formatarData(convenio.dataInicio)}</td>
                         <td>${formatarData(convenio.dataFim)}</td>
@@ -1326,8 +1257,9 @@
 
         // Editar convênio
         window.editarConvenio = function(id) {
-            if (!currentUser || currentUser.role !== 'admin') {
-                alert('❌ Acesso negado! Você precisa estar logado como administrador.');
+            if (!isAdmin) {
+                alert('❌ Acesso negado! Digite a senha para editar convênios.');
+                mostrarSenha();
                 return;
             }
 
@@ -1353,8 +1285,9 @@
 
         // Excluir convênio
         window.excluirConvenio = async function(id) {
-            if (!currentUser || currentUser.role !== 'admin') {
-                alert('❌ Acesso negado! Você precisa estar logado como administrador.');
+            if (!isAdmin) {
+                alert('❌ Acesso negado! Digite a senha para editar convênios.');
+                mostrarSenha();
                 return;
             }
 
