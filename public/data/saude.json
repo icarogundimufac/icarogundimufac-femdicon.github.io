@@ -1,0 +1,130 @@
+{
+  "id": "saude",
+  "label": "Saúde",
+  "lastUpdated": "2024-03-01",
+  "groups": [
+    {
+      "id": "mortalidade",
+      "label": "Mortalidade",
+      "indicators": [
+        {
+          "id": "mortalidade_infantil",
+          "label": "Taxa de Mortalidade Infantil",
+          "description": "Óbitos de menores de 1 ano por 1.000 nascidos vivos",
+          "unit": "/1.000 NV",
+          "source": "SIM/DATASUS",
+          "latestValue": 16.8,
+          "delta": -1.4,
+          "deltaDirection": "down",
+          "timeSeries": [
+            { "year": 2017, "value": 22.3 },
+            { "year": 2018, "value": 21.0 },
+            { "year": 2019, "value": 19.5 },
+            { "year": 2020, "value": 18.2 },
+            { "year": 2021, "value": 17.6 },
+            { "year": 2022, "value": 16.8 }
+          ]
+        },
+        {
+          "id": "mortalidade_materna",
+          "label": "Razão de Mortalidade Materna",
+          "description": "Óbitos maternos por 100.000 nascidos vivos",
+          "unit": "/100.000 NV",
+          "source": "SIM/DATASUS",
+          "latestValue": 62.4,
+          "delta": -8.2,
+          "deltaDirection": "down",
+          "timeSeries": [
+            { "year": 2017, "value": 92.1 },
+            { "year": 2018, "value": 88.4 },
+            { "year": 2019, "value": 81.2 },
+            { "year": 2020, "value": 75.6 },
+            { "year": 2021, "value": 70.6 },
+            { "year": 2022, "value": 62.4 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "prevencao",
+      "label": "Prevenção",
+      "indicators": [
+        {
+          "id": "cobertura_vacinacao",
+          "label": "Cobertura Vacinal Média",
+          "description": "Percentual de cobertura do calendário básico de vacinação infantil",
+          "unit": "%",
+          "source": "PNI/DATASUS",
+          "latestValue": 84.3,
+          "delta": 2.1,
+          "deltaDirection": "up",
+          "timeSeries": [
+            { "year": 2017, "value": 91.2 },
+            { "year": 2018, "value": 89.4 },
+            { "year": 2019, "value": 87.1 },
+            { "year": 2020, "value": 78.6 },
+            { "year": 2021, "value": 80.4 },
+            { "year": 2022, "value": 82.2 },
+            { "year": 2023, "value": 84.3 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "atencao_basica",
+      "label": "Atenção Básica",
+      "indicators": [
+        {
+          "id": "cobertura_ab",
+          "label": "Cobertura de Atenção Básica por Município (%)",
+          "description": "Percentual da população coberta por equipes de saúde da família",
+          "unit": "%",
+          "source": "CNES/DATASUS",
+          "timeSeries": [],
+          "byMunicipio": {
+            "rio-branco": 72.4,
+            "cruzeiro-do-sul": 83.1,
+            "sena-madureira": 91.5,
+            "tarauaca": 88.2,
+            "feijo": 94.6,
+            "brasileia": 78.9,
+            "placido-de-castro": 96.3,
+            "xapuri": 88.7,
+            "senador-guiomard": 82.1,
+            "porto-acre": 97.4,
+            "mancio-lima": 89.5,
+            "marechal-thaumaturgo": 100.0,
+            "rodrigues-alves": 95.2,
+            "acrelandia": 91.8,
+            "capixaba": 100.0,
+            "epitaciolandia": 85.3,
+            "bujari": 98.7,
+            "porto-walter": 100.0,
+            "jordao": 100.0,
+            "santa-rosa-do-purus": 100.0,
+            "manoel-urbano": 93.4,
+            "assis-brasil": 100.0
+          }
+        },
+        {
+          "id": "leitos_sus",
+          "label": "Leitos SUS / 1.000 hab.",
+          "description": "Número de leitos hospitalares do SUS por 1.000 habitantes",
+          "unit": "/1.000 hab.",
+          "source": "CNES/DATASUS",
+          "latestValue": 2.1,
+          "delta": 0.1,
+          "deltaDirection": "up",
+          "timeSeries": [
+            { "year": 2018, "value": 1.7 },
+            { "year": 2019, "value": 1.8 },
+            { "year": 2020, "value": 1.9 },
+            { "year": 2021, "value": 2.0 },
+            { "year": 2022, "value": 2.1 },
+            { "year": 2023, "value": 2.1 }
+          ]
+        }
+      ]
+    }
+  ]
+}

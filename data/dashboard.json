@@ -1,0 +1,116 @@
+{
+  "lastUpdated": "2024-03-01",
+  "kpis": [
+    {
+      "id": "ideb_anos_iniciais",
+      "section": "educacao",
+      "label": "IDEB — Anos Iniciais",
+      "value": 5.2,
+      "unit": "pontos",
+      "delta": 0.3,
+      "deltaDirection": "up",
+      "positiveDirection": "up",
+      "year": 2023
+    },
+    {
+      "id": "mortalidade_infantil",
+      "section": "saude",
+      "label": "Mortalidade Infantil",
+      "value": 16.8,
+      "unit": "/1.000 NV",
+      "delta": -1.4,
+      "deltaDirection": "down",
+      "positiveDirection": "down",
+      "year": 2023
+    },
+    {
+      "id": "taxa_homicidios",
+      "section": "seguranca",
+      "label": "Taxa de Homicídios",
+      "value": 22.4,
+      "unit": "/100 mil",
+      "delta": -2.1,
+      "deltaDirection": "down",
+      "positiveDirection": "down",
+      "year": 2023
+    },
+    {
+      "id": "receita_total",
+      "section": "orcamento",
+      "label": "Receita Total",
+      "value": 8200000000,
+      "unit": "R$",
+      "delta": 4.2,
+      "deltaDirection": "up",
+      "positiveDirection": "up",
+      "year": 2023
+    },
+    {
+      "id": "taxa_analfabetismo",
+      "section": "educacao",
+      "label": "Taxa de Analfabetismo",
+      "value": 12.8,
+      "unit": "%",
+      "delta": -1.1,
+      "deltaDirection": "down",
+      "positiveDirection": "down",
+      "year": 2022
+    },
+    {
+      "id": "cobertura_vacinal",
+      "section": "saude",
+      "label": "Cobertura Vacinal",
+      "value": 84.3,
+      "unit": "%",
+      "delta": 2.1,
+      "deltaDirection": "up",
+      "positiveDirection": "up",
+      "year": 2023
+    },
+    {
+      "id": "populacao",
+      "section": "municipios",
+      "label": "População Estimada",
+      "value": 906876,
+      "unit": "hab.",
+      "delta": 1.2,
+      "deltaDirection": "up",
+      "positiveDirection": "up",
+      "year": 2023
+    },
+    {
+      "id": "municipios_count",
+      "section": "municipios",
+      "label": "Municípios",
+      "value": 22,
+      "unit": "municípios",
+      "year": 2023
+    }
+  ],
+  "sectionSummaries": [
+    {
+      "section": "educacao",
+      "headline": "IDEB Anos Iniciais",
+      "value": "5,2 pts",
+      "trend": [4.4, 4.6, 4.8, 4.9, 5.1, 5.2]
+    },
+    {
+      "section": "saude",
+      "headline": "Mortalidade Infantil",
+      "value": "16,8/1.000 NV",
+      "trend": [22.3, 21.0, 19.5, 18.2, 17.6, 16.8]
+    },
+    {
+      "section": "seguranca",
+      "headline": "Taxa de Homicídios",
+      "value": "22,4/100 mil",
+      "trend": [28.4, 26.1, 25.3, 24.8, 24.1, 22.4]
+    },
+    {
+      "section": "orcamento",
+      "headline": "Receita Total",
+      "value": "R$ 8,2 bi",
+      "trend": [6.1, 6.5, 6.9, 7.2, 7.8, 8.2]
+    }
+  ]
+}

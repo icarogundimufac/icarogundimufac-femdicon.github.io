@@ -1,0 +1,147 @@
+{
+  "id": "educacao",
+  "label": "Educação",
+  "lastUpdated": "2024-03-01",
+  "groups": [
+    {
+      "id": "matriculas",
+      "label": "Matrículas",
+      "indicators": [
+        {
+          "id": "matriculas_total",
+          "label": "Total de Matrículas — Educação Básica",
+          "description": "Total de matrículas na educação básica pública (rede estadual e municipal)",
+          "unit": "alunos",
+          "source": "INEP/Censo Escolar",
+          "latestValue": 223460,
+          "delta": 4200,
+          "deltaDirection": "up",
+          "timeSeries": [
+            { "year": 2018, "value": 207300 },
+            { "year": 2019, "value": 210100 },
+            { "year": 2020, "value": 205800 },
+            { "year": 2021, "value": 212400 },
+            { "year": 2022, "value": 219260 },
+            { "year": 2023, "value": 223460 }
+          ]
+        },
+        {
+          "id": "matriculas_educacao_infantil",
+          "label": "Matrículas — Educação Infantil",
+          "description": "Matrículas em creche e pré-escola",
+          "unit": "alunos",
+          "source": "INEP/Censo Escolar",
+          "latestValue": 45200,
+          "delta": 1800,
+          "deltaDirection": "up",
+          "timeSeries": [
+            { "year": 2018, "value": 38400 },
+            { "year": 2019, "value": 40100 },
+            { "year": 2020, "value": 39200 },
+            { "year": 2021, "value": 41800 },
+            { "year": 2022, "value": 43400 },
+            { "year": 2023, "value": 45200 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "desempenho",
+      "label": "Desempenho",
+      "indicators": [
+        {
+          "id": "ideb_anos_iniciais",
+          "label": "IDEB — Anos Iniciais (5º ano)",
+          "description": "Índice de Desenvolvimento da Educação Básica — média estadual para os anos iniciais do ensino fundamental",
+          "unit": "pontos",
+          "source": "INEP/MEC",
+          "latestValue": 5.2,
+          "delta": 0.3,
+          "deltaDirection": "up",
+          "timeSeries": [
+            { "year": 2013, "value": 3.9 },
+            { "year": 2015, "value": 4.2 },
+            { "year": 2017, "value": 4.5 },
+            { "year": 2019, "value": 4.9 },
+            { "year": 2021, "value": 5.1 },
+            { "year": 2023, "value": 5.2 }
+          ]
+        },
+        {
+          "id": "ideb_anos_finais",
+          "label": "IDEB — Anos Finais (9º ano)",
+          "description": "Índice de Desenvolvimento da Educação Básica — média estadual para os anos finais do ensino fundamental",
+          "unit": "pontos",
+          "source": "INEP/MEC",
+          "latestValue": 4.4,
+          "delta": 0.2,
+          "deltaDirection": "up",
+          "timeSeries": [
+            { "year": 2013, "value": 3.4 },
+            { "year": 2015, "value": 3.7 },
+            { "year": 2017, "value": 3.9 },
+            { "year": 2019, "value": 4.1 },
+            { "year": 2021, "value": 4.2 },
+            { "year": 2023, "value": 4.4 }
+          ]
+        },
+        {
+          "id": "ideb_municipios",
+          "label": "IDEB por Município — Anos Iniciais (2023)",
+          "description": "IDEB dos anos iniciais do ensino fundamental por município",
+          "unit": "pontos",
+          "source": "INEP/MEC",
+          "timeSeries": [],
+          "byMunicipio": {
+            "rio-branco": 5.6,
+            "cruzeiro-do-sul": 5.1,
+            "sena-madureira": 4.8,
+            "tarauaca": 4.5,
+            "feijo": 4.4,
+            "brasileia": 5.2,
+            "placido-de-castro": 4.9,
+            "xapuri": 5.0,
+            "senador-guiomard": 5.3,
+            "porto-acre": 4.6,
+            "mancio-lima": 4.3,
+            "marechal-thaumaturgo": 3.9,
+            "rodrigues-alves": 4.1,
+            "acrelandia": 4.8,
+            "capixaba": 4.7,
+            "epitaciolandia": 5.0,
+            "bujari": 4.5,
+            "porto-walter": 3.8,
+            "jordao": 3.6,
+            "santa-rosa-do-purus": 3.4,
+            "manoel-urbano": 4.2,
+            "assis-brasil": 4.6
+          }
+        }
+      ]
+    },
+    {
+      "id": "alfabetizacao",
+      "label": "Alfabetização",
+      "indicators": [
+        {
+          "id": "taxa_analfabetismo",
+          "label": "Taxa de Analfabetismo (15+ anos)",
+          "description": "Percentual da população de 15 anos ou mais que não sabe ler nem escrever",
+          "unit": "%",
+          "source": "IBGE/PNAD",
+          "latestValue": 12.8,
+          "delta": -1.1,
+          "deltaDirection": "down",
+          "timeSeries": [
+            { "year": 2016, "value": 17.2 },
+            { "year": 2017, "value": 16.5 },
+            { "year": 2018, "value": 15.8 },
+            { "year": 2019, "value": 15.1 },
+            { "year": 2021, "value": 13.9 },
+            { "year": 2022, "value": 12.8 }
+          ]
+        }
+      ]
+    }
+  ]
+}

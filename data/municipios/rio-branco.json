@@ -1,0 +1,19 @@
+{
+  "slug": "rio-branco",
+  "nome": "Rio Branco",
+  "populacao": 419452,
+  "area": 8834,
+  "regiaoJudiciaria": "Alto Acre",
+  "distanciaCapital": 0,
+  "idhm": 0.727,
+  "lat": -9.9754,
+  "lng": -67.8249,
+  "indicadores": [
+    { "section": "educacao", "id": "ideb_anos_iniciais", "label": "IDEB Anos Iniciais", "value": 5.6, "unit": "pontos", "year": 2023 },
+    { "section": "educacao", "id": "taxa_analfabetismo", "label": "Taxa de Analfabetismo", "value": 8.4, "unit": "%", "year": 2022 },
+    { "section": "saude", "id": "mortalidade_infantil", "label": "Mortalidade Infantil", "value": 14.2, "unit": "/1.000 NV", "year": 2022 },
+    { "section": "saude", "id": "cobertura_ab", "label": "Cobertura de Atenção Básica", "value": 72.4, "unit": "%", "year": 2023 },
+    { "section": "seguranca", "id": "taxa_homicidios", "label": "Taxa de Homicídios", "value": 24.8, "unit": "/100 mil hab.", "year": 2023 },
+    { "section": "seguranca", "id": "taxa_roubos", "label": "Taxa de Roubos", "value": 612.3, "unit": "/100 mil hab.", "year": 2023 }
+  ]
+}

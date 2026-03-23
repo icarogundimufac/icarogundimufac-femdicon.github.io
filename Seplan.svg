@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 400" width="100%" height="100%">
+  <style>
+    .title {
+      font-family: "Arial Black", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-weight: 900;
+      font-size: 260px;
+      fill: #00933C;
+    }
+    .subtitle {
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-weight: normal;
+      font-size: 48px;
+      fill: #5C5C5C;
+    }
+  </style>
+
+  <!-- Texto Principal: SEPLAN (Forçado a ter 1100px de largura para alinhar perfeitamente) -->
+  <text x="700" y="240" class="title" text-anchor="middle" textLength="1100" lengthAdjust="spacing">SEPLAN</text>
+
+  <!-- Linha Amarela Separadora (Exatamente 1100px de largura) -->
+  <rect x="150" y="270" width="1100" height="12" fill="#FDC82F" />
+
+  <!-- Texto Secundário (Forçado a ter 1100px de largura) -->
+  <text x="700" y="345" class="subtitle" text-anchor="middle" textLength="1100" lengthAdjust="spacing">SECRETARIA DE ESTADO DE PLANEJAMENTO</text>
+</svg>

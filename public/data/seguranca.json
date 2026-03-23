@@ -1,0 +1,95 @@
+{
+  "id": "seguranca",
+  "label": "Segurança",
+  "lastUpdated": "2024-03-01",
+  "groups": [
+    {
+      "id": "crimes_violentos",
+      "label": "Crimes Violentos",
+      "indicators": [
+        {
+          "id": "taxa_homicidios",
+          "label": "Taxa de Homicídios",
+          "description": "Homicídios dolosos por 100.000 habitantes",
+          "unit": "/100 mil hab.",
+          "source": "SSP/AC · SIM/DATASUS",
+          "latestValue": 22.4,
+          "delta": -2.1,
+          "deltaDirection": "down",
+          "timeSeries": [
+            { "year": 2017, "value": 32.1 },
+            { "year": 2018, "value": 29.8 },
+            { "year": 2019, "value": 27.6 },
+            { "year": 2020, "value": 26.3 },
+            { "year": 2021, "value": 25.1 },
+            { "year": 2022, "value": 24.5 },
+            { "year": 2023, "value": 22.4 }
+          ]
+        },
+        {
+          "id": "total_homicidios",
+          "label": "Total de Homicídios",
+          "description": "Número absoluto de homicídios dolosos registrados",
+          "unit": "casos",
+          "source": "SSP/AC",
+          "latestValue": 203,
+          "delta": -19,
+          "deltaDirection": "down",
+          "timeSeries": [
+            { "year": 2017, "value": 291 },
+            { "year": 2018, "value": 270 },
+            { "year": 2019, "value": 250 },
+            { "year": 2020, "value": 238 },
+            { "year": 2021, "value": 228 },
+            { "year": 2022, "value": 222 },
+            { "year": 2023, "value": 203 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "crimes_patrimonio",
+      "label": "Crimes contra o Patrimônio",
+      "indicators": [
+        {
+          "id": "taxa_roubos",
+          "label": "Taxa de Roubos",
+          "description": "Registros de roubo por 100.000 habitantes",
+          "unit": "/100 mil hab.",
+          "source": "SSP/AC · SINESP",
+          "latestValue": 512.6,
+          "delta": -28.4,
+          "deltaDirection": "down",
+          "timeSeries": [
+            { "year": 2017, "value": 628.3 },
+            { "year": 2018, "value": 605.1 },
+            { "year": 2019, "value": 582.4 },
+            { "year": 2020, "value": 558.2 },
+            { "year": 2021, "value": 541.0 },
+            { "year": 2022, "value": 541.0 },
+            { "year": 2023, "value": 512.6 }
+          ]
+        },
+        {
+          "id": "taxa_furtos",
+          "label": "Taxa de Furtos",
+          "description": "Registros de furto por 100.000 habitantes",
+          "unit": "/100 mil hab.",
+          "source": "SSP/AC · SINESP",
+          "latestValue": 318.4,
+          "delta": -12.8,
+          "deltaDirection": "down",
+          "timeSeries": [
+            { "year": 2017, "value": 378.2 },
+            { "year": 2018, "value": 365.4 },
+            { "year": 2019, "value": 351.8 },
+            { "year": 2020, "value": 342.6 },
+            { "year": 2021, "value": 335.2 },
+            { "year": 2022, "value": 331.2 },
+            { "year": 2023, "value": 318.4 }
+          ]
+        }
+      ]
+    }
+  ]
+}

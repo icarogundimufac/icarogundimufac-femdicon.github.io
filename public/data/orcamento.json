@@ -1,0 +1,92 @@
+{
+  "id": "orcamento",
+  "label": "Orçamento",
+  "lastUpdated": "2024-03-01",
+  "groups": [
+    {
+      "id": "receitas",
+      "label": "Receitas",
+      "indicators": [
+        {
+          "id": "receita_total",
+          "label": "Receita Total Arrecadada",
+          "description": "Total de receitas arrecadadas pelo Estado do Acre no exercício",
+          "unit": "R$",
+          "source": "SEFAZ/AC · SICONFI/STN",
+          "latestValue": 8200000000,
+          "delta": 4.2,
+          "deltaDirection": "up",
+          "timeSeries": [
+            { "year": 2018, "value": 5800000000 },
+            { "year": 2019, "value": 6100000000 },
+            { "year": 2020, "value": 6350000000 },
+            { "year": 2021, "value": 6900000000 },
+            { "year": 2022, "value": 7500000000 },
+            { "year": 2023, "value": 8200000000 }
+          ]
+        },
+        {
+          "id": "fpe",
+          "label": "Fundo de Participação dos Estados (FPE)",
+          "description": "Repasse do Fundo de Participação dos Estados",
+          "unit": "R$",
+          "source": "STN/MF",
+          "latestValue": 3100000000,
+          "delta": 5.8,
+          "deltaDirection": "up",
+          "timeSeries": [
+            { "year": 2018, "value": 2300000000 },
+            { "year": 2019, "value": 2450000000 },
+            { "year": 2020, "value": 2550000000 },
+            { "year": 2021, "value": 2750000000 },
+            { "year": 2022, "value": 2930000000 },
+            { "year": 2023, "value": 3100000000 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "despesas",
+      "label": "Despesas",
+      "indicators": [
+        {
+          "id": "despesa_total",
+          "label": "Despesa Total Empenhada",
+          "description": "Total de despesas empenhadas pelo Estado do Acre no exercício",
+          "unit": "R$",
+          "source": "SEFAZ/AC · SICONFI/STN",
+          "latestValue": 8050000000,
+          "delta": 3.9,
+          "deltaDirection": "up",
+          "timeSeries": [
+            { "year": 2018, "value": 5700000000 },
+            { "year": 2019, "value": 5950000000 },
+            { "year": 2020, "value": 6200000000 },
+            { "year": 2021, "value": 6750000000 },
+            { "year": 2022, "value": 7300000000 },
+            { "year": 2023, "value": 8050000000 }
+          ]
+        },
+        {
+          "id": "despesa_funcao",
+          "label": "Despesa por Função (2023)",
+          "description": "Distribuição das despesas por área de atuação governamental",
+          "unit": "R$",
+          "source": "SEFAZ/AC",
+          "timeSeries": [],
+          "byMunicipio": {
+            "educacao": 2254000000,
+            "saude": 1449000000,
+            "seguranca-publica": 966000000,
+            "administracao": 724500000,
+            "previdencia-social": 1207500000,
+            "infraestrutura": 563500000,
+            "assistencia-social": 241500000,
+            "agricultura": 201250000,
+            "outros": 443750000
+          }
+        }
+      ]
+    }
+  ]
+}
