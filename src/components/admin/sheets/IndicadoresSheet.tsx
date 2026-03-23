@@ -1,0 +1,86 @@
+import type { GridColumn } from '../SpreadsheetGrid'
+import type { EditableIndicatorRow } from '@/types/admin-data'
+
+export const indicadoresColumns: GridColumn<EditableIndicatorRow>[] = [
+  {
+    id: 'lastUpdated',
+    header: 'Atualizado em',
+    accessor: (row) => row.lastUpdated,
+    editable: true,
+    width: 120,
+  },
+  {
+    id: 'indicatorLabel',
+    header: 'Indicador',
+    accessor: (row) => row.indicatorLabel,
+    editable: true,
+    width: 200,
+  },
+  {
+    id: 'description',
+    header: 'Descricao',
+    accessor: (row) => row.description,
+    editable: true,
+    width: 200,
+  },
+  {
+    id: 'unit',
+    header: 'Unidade',
+    accessor: (row) => row.unit,
+    editable: true,
+    width: 90,
+  },
+  {
+    id: 'source',
+    header: 'Fonte',
+    accessor: (row) => row.source,
+    editable: true,
+    width: 140,
+  },
+  {
+    id: 'latestValue',
+    header: 'Ultimo valor',
+    accessor: (row) => row.latestValue ?? '',
+    editable: true,
+    type: 'number',
+    width: 100,
+  },
+  {
+    id: 'delta',
+    header: 'Delta',
+    accessor: (row) => row.delta ?? '',
+    editable: true,
+    type: 'number',
+    width: 80,
+  },
+  {
+    id: 'deltaDirection',
+    header: 'Direcao',
+    accessor: (row) => row.deltaDirection,
+    editable: true,
+    type: 'select',
+    options: [
+      { value: '', label: 'Vazio' },
+      { value: 'up', label: 'up' },
+      { value: 'down', label: 'down' },
+      { value: 'neutral', label: 'neutral' },
+    ],
+    width: 100,
+  },
+  {
+    id: 'year',
+    header: 'Ano',
+    accessor: (row) => row.year,
+    editable: true,
+    type: 'number',
+    width: 80,
+  },
+  {
+    id: 'value',
+    header: 'Valor',
+    accessor: (row) => row.value,
+    editable: true,
+    type: 'number',
+    width: 100,
+  },
+]

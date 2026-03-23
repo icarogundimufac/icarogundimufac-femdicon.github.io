@@ -1,17 +1,19 @@
+import { useEffect, useMemo, useState } from 'react'
 import { Header } from '@/components/layout/Header'
 import { PageShell, PageContent } from '@/components/layout/PageShell'
 import { SectionSummary } from '@/components/dashboard/SectionSummary'
 import { AcreMap } from '@/components/maps/AcreMap'
 import {
-  getIndicatorLatestByMunicipio,
-  getSectionFallbackMapYear,
+  DEFAULT_MAP_VARIABLE_KEY,
+  getMapVariableData,
 } from '@/lib/data/portal-data'
+import type { PortalDataBundle, MapVariableOption } from '@/types/admin-data'
 import type { DashboardData, KpiData } from '@/types/dashboard'
-import type { IndicatorSection } from '@/types/indicators'
 
 interface DashboardPageProps {
   data: DashboardData | null
-  educacaoData: IndicatorSection | null
+  bundle: PortalDataBundle | null
+  variableOptions: MapVariableOption[]
 }
 
 const SECTION_COLOR: Record<string, string> = {
@@ -63,17 +65,63 @@ function KpiSidebarItem({ kpi }: { kpi: KpiData }) {
   )
 }
 
-export function DashboardPage({ data, educacaoData }: DashboardPageProps) {
-  const idebIndicator = educacaoData?.groups
-    .find((group) => group.id === 'desempenho')
-    ?.indicators.find((indicator) => indicator.id === 'ideb_municipios')
-  const idebByMunicipio =
-    educacaoData && idebIndicator
-      ? getIndicatorLatestByMunicipio(
-          idebIndicator,
-          getSectionFallbackMapYear(educacaoData),
-        ) ?? {}
-      : {}
+export function DashboardPage({ data, bundle, variableOptions }: DashboardPageProps) {
+  const [selectedVariableKey, setSelectedVariableKey] = useState(DEFAULT_MAP_VARIABLE_KEY)
+  const [selectedYear, setSelectedYear] = useState(2023)
+
+  const selectedVariable = variableOptions.find(
+    (option) => option.key === selectedVariableKey,
+  )
+
+  useEffect(() => {
+    if (variableOptions.length === 0) return
+
+    const preferred =
+      variableOptions.find((option) => option.key === selectedVariableKey) ??
+      variableOptions.find((option) => option.key === DEFAULT_MAP_VARIABLE_KEY) ??
+      variableOptions[0]
+
+    if (preferred.key !== selectedVariableKey) {
+      setSelectedVariableKey(preferred.key)
+      return
+    }
+
+    if (!preferred.years.includes(selectedYear)) {
+      setSelectedYear(preferred.years[preferred.years.length - 1] ?? 0)
+    }
+  }, [selectedVariableKey, selectedYear, variableOptions])
+
+  const mapData = useMemo(
+    () =>
+      bundle
+        ? getMapVariableData(bundle, selectedVariableKey, selectedYear)
+        : {
+            dataByMunicipio: {} as Record<string, number>,
+            label: 'Indicador',
+            unit: '',
+            source: '',
+          },
+    [bundle, selectedVariableKey, selectedYear],
+  )
+
+  const colorScale =
+    selectedVariable?.sectionId === 'saude'
+      ? 'heat'
+      : selectedVariable?.sectionId === 'seguranca'
+        ? 'estrela'
+        : 'verde'
+
+  // Group variable options by section for <optgroup>
+  const optionsBySection = useMemo(() => {
+    const groups: Record<string, { label: string; options: MapVariableOption[] }> = {}
+    for (const option of variableOptions) {
+      if (!groups[option.sectionId]) {
+        groups[option.sectionId] = { label: option.sectionLabel, options: [] }
+      }
+      groups[option.sectionId].options.push(option)
+    }
+    return Object.values(groups)
+  }, [variableOptions])
 
   return (
     <PageShell>
@@ -87,19 +135,52 @@ export function DashboardPage({ data, educacaoData }: DashboardPageProps) {
         <section className="mb-8">
           <div className="flex gap-5 items-stretch">
             <div className="flex-[2] min-w-0 bg-white rounded-xl border border-areia-200 shadow-sm overflow-hidden">
-              <div className="px-5 py-3 border-b border-areia-100 flex items-center justify-between">
-                <p className="text-sm font-semibold text-areia-800 font-jakarta">
+              <div className="px-5 py-3 border-b border-areia-100 flex items-center justify-between gap-3">
+                <p className="text-sm font-semibold text-areia-800 font-jakarta shrink-0">
                   Mapa do Estado do Acre
                 </p>
-                <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded border border-[#F2C230]/40 bg-[#F2C230]/10 text-[#1F6B3A] font-jakarta">
-                  Fonte: IBGE + Esri
-                </span>
+
+                <div className="flex items-center gap-2 min-w-0">
+                  <select
+                    value={selectedVariableKey}
+                    onChange={(event) => setSelectedVariableKey(event.currentTarget.value)}
+                    className="min-w-0 max-w-[260px] truncate rounded-lg border border-areia-200 bg-areia-50/60 px-2.5 py-1 text-[12px] text-areia-700 font-jakarta transition hover:border-areia-300 focus:border-verde-400 focus:ring-1 focus:ring-verde-400/30 focus:outline-none"
+                  >
+                    {optionsBySection.map((group) => (
+                      <optgroup key={group.label} label={group.label}>
+                        {group.options.map((option) => (
+                          <option key={option.key} value={option.key}>
+                            {option.indicatorLabel}
+                          </option>
+                        ))}
+                      </optgroup>
+                    ))}
+                  </select>
+
+                  <select
+                    value={selectedYear}
+                    onChange={(event) => setSelectedYear(Number(event.currentTarget.value))}
+                    className="w-[72px] rounded-lg border border-areia-200 bg-areia-50/60 px-2 py-1 text-[12px] text-areia-700 font-jakarta tabular-nums transition hover:border-areia-300 focus:border-verde-400 focus:ring-1 focus:ring-verde-400/30 focus:outline-none"
+                  >
+                    {(selectedVariable?.years ?? []).map((year) => (
+                      <option key={year} value={year}>
+                        {year}
+                      </option>
+                    ))}
+                  </select>
+
+                  {selectedVariable && (
+                    <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded border border-[#F2C230]/40 bg-[#F2C230]/10 text-[#1F6B3A] font-jakarta shrink-0 whitespace-nowrap">
+                      Fonte: {selectedVariable.source}
+                    </span>
+                  )}
+                </div>
               </div>
               <AcreMap
-                dataByMunicipio={idebByMunicipio as Record<string, number>}
-                unit="pts"
-                label="IDEB 2023"
-                colorScale="verde"
+                dataByMunicipio={mapData.dataByMunicipio}
+                unit={mapData.unit}
+                label={mapData.label}
+                colorScale={colorScale}
                 height={460}
               />
             </div>
