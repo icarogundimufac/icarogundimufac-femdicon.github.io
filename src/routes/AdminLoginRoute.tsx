@@ -19,6 +19,7 @@ export function AdminLoginRoute() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const nextPath = useMemo(
     () =>
@@ -35,14 +36,17 @@ export function AdminLoginRoute() {
     }
   }, [navigate, nextPath])
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    setIsSubmitting(true)
 
-    if (authenticateAdmin(password)) {
+    if (await authenticateAdmin(password)) {
+      setIsSubmitting(false)
       navigate(nextPath, { replace: true })
       return
     }
 
+    setIsSubmitting(false)
     setError('Senha incorreta.')
   }
 
@@ -135,15 +139,15 @@ export function AdminLoginRoute() {
 
               <button
                 type="submit"
-                disabled={!hasPassword}
+                disabled={!hasPassword || isSubmitting}
                 className={cn(
                   'flex h-12 w-full items-center justify-center rounded-[18px] text-sm font-semibold transition-all',
-                  hasPassword
+                  hasPassword && !isSubmitting
                     ? 'bg-verde-700 text-white shadow-[0_16px_30px_rgba(21,114,68,0.22)] hover:-translate-y-0.5 hover:bg-verde-800'
                     : 'cursor-not-allowed bg-areia-200 text-areia-400',
                 )}
               >
-                Entrar
+                {isSubmitting ? 'Entrando...' : 'Entrar'}
               </button>
             </form>
           </div>

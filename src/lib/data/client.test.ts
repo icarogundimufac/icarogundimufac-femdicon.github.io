@@ -8,12 +8,12 @@ import {
 describe('portalDataClient', () => {
   afterEach(() => {
     vi.restoreAllMocks()
+    window.localStorage.clear()
   })
 
-  it('carrega uma seção pelo caminho esperado', async () => {
-    const fetchSpy = vi
-      .spyOn(globalThis, 'fetch')
-      .mockResolvedValue(
+  it('carrega uma seção preferindo a API persistida', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce(
         new Response(JSON.stringify({ id: 'educacao', groups: [] }), {
           status: 200,
           headers: { 'Content-Type': 'application/json' },
@@ -22,7 +22,24 @@ describe('portalDataClient', () => {
 
     const data = await portalDataClient.getSection('educacao')
 
-    expect(fetchSpy).toHaveBeenCalledWith('/data/educacao.json')
+    expect(fetchSpy).toHaveBeenCalledWith('/api/sections/educacao', undefined)
+    expect(data).toEqual({ id: 'educacao', groups: [] })
+  })
+
+  it('cai no JSON estatico quando a API retorna 404', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce(new Response(null, { status: 404 }))
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ id: 'educacao', groups: [] }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+      )
+
+    const data = await portalDataClient.getSection('educacao')
+
+    expect(fetchSpy).toHaveBeenNthCalledWith(1, '/api/sections/educacao', undefined)
+    expect(fetchSpy).toHaveBeenNthCalledWith(2, '/data/educacao.json', undefined)
     expect(data).toEqual({ id: 'educacao', groups: [] })
   })
 
@@ -52,11 +69,11 @@ describe('portalDataClient', () => {
   it('prefaz os dados corretos para a rota de mapas', async () => {
     const fetchSpy = vi
       .spyOn(globalThis, 'fetch')
-      .mockResolvedValue(
-        new Response(JSON.stringify({ ok: true }), {
+      .mockImplementation(() =>
+        Promise.resolve(new Response(JSON.stringify({ ok: true }), {
           status: 200,
           headers: { 'Content-Type': 'application/json' },
-        }),
+        })),
       )
 
     const queryClient = new QueryClient({
@@ -67,12 +84,12 @@ describe('portalDataClient', () => {
 
     await prefetchPathData(queryClient, '/mapas')
 
-    expect(fetchSpy).toHaveBeenCalledWith('/data/educacao.json')
-    expect(fetchSpy).toHaveBeenCalledWith('/data/saude.json')
-    expect(fetchSpy).toHaveBeenCalledWith('/data/seguranca.json')
-    expect(fetchSpy).toHaveBeenCalledWith('/data/orcamento.json')
-    expect(fetchSpy).toHaveBeenCalledWith('/data/municipios/index.json')
-    expect(fetchSpy).toHaveBeenCalledWith('/shapefiles/acre-municipios.geojson')
+    expect(fetchSpy).toHaveBeenCalledWith('/api/sections/educacao', undefined)
+    expect(fetchSpy).toHaveBeenCalledWith('/api/sections/saude', undefined)
+    expect(fetchSpy).toHaveBeenCalledWith('/api/sections/seguranca', undefined)
+    expect(fetchSpy).toHaveBeenCalledWith('/api/sections/orcamento', undefined)
+    expect(fetchSpy).toHaveBeenCalledWith('/data/municipios/index.json', undefined)
+    expect(fetchSpy).toHaveBeenCalledWith('/shapefiles/acre-municipios.geojson', undefined)
     expect(queryClient.getQueryData(queryKeys.section('educacao'))).toEqual({ ok: true })
   })
 })

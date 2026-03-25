@@ -16,14 +16,15 @@ export interface PortalDataClient {
 }
 
 const DATA_BASE = '/data'
+const SECTION_API_BASE = '/api/sections'
 
 function isJsonResponse(response: Response) {
   const contentType = response.headers.get('content-type') ?? ''
   return contentType.toLowerCase().includes('json')
 }
 
-async function fetchJson<T>(path: string): Promise<T> {
-  const response = await fetch(path)
+async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
+  const response = await fetch(path, init)
 
   if (!response.ok) {
     throw new Error(`Falha ao carregar ${path}`)
@@ -36,8 +37,8 @@ async function fetchJson<T>(path: string): Promise<T> {
   return response.json() as Promise<T>
 }
 
-async function fetchOptionalJson<T>(path: string): Promise<T | null> {
-  const response = await fetch(path)
+async function fetchOptionalJson<T>(path: string, init?: RequestInit): Promise<T | null> {
+  const response = await fetch(path, init)
 
   if (response.status === 404) {
     return null
@@ -54,10 +55,100 @@ async function fetchOptionalJson<T>(path: string): Promise<T | null> {
   return response.json() as Promise<T>
 }
 
+async function readResponseMessage(response: Response) {
+  if (isJsonResponse(response)) {
+    try {
+      const body = await response.json() as { message?: unknown }
+      if (typeof body.message === 'string') return body.message
+    } catch {
+      // usa fallback abaixo
+    }
+  }
+
+  const text = await response.text()
+  return text.trim() || `Falha ao carregar ${response.url}`
+}
+
+const ADMIN_SECTION_KEY = (sectionId: IndicatorSectionId) =>
+  `femdicon:admin:section:${sectionId}`
+
+export function saveAdminSection(sectionId: IndicatorSectionId, section: IndicatorSection) {
+  try {
+    localStorage.setItem(ADMIN_SECTION_KEY(sectionId), JSON.stringify(section))
+  } catch {
+    // localStorage indisponível (ex: modo privado com storage bloqueado)
+  }
+}
+
+export function loadAdminSection(sectionId: IndicatorSectionId): IndicatorSection | null {
+  try {
+    const raw = localStorage.getItem(ADMIN_SECTION_KEY(sectionId))
+    return raw ? (JSON.parse(raw) as IndicatorSection) : null
+  } catch {
+    return null
+  }
+}
+
+export function clearAdminSectionCache(sectionId: IndicatorSectionId) {
+  try {
+    localStorage.removeItem(ADMIN_SECTION_KEY(sectionId))
+  } catch {
+    // localStorage indisponível
+  }
+}
+
+async function fetchSectionWithFallback(sectionId: IndicatorSectionId) {
+  try {
+    const persistedSection = await fetchOptionalJson<IndicatorSection>(
+      `${SECTION_API_BASE}/${sectionId}`,
+    )
+
+    if (persistedSection) {
+      saveAdminSection(sectionId, persistedSection)
+      return persistedSection
+    }
+  } catch {
+    // cai para o JSON estatico
+  }
+
+  try {
+    const staticSection = await fetchOptionalJson<IndicatorSection>(
+      `${DATA_BASE}/${sectionId}.json`,
+    )
+
+    if (staticSection) {
+      saveAdminSection(sectionId, staticSection)
+      return staticSection
+    }
+  } catch {
+    // usa cache local como ultimo recurso
+  }
+
+  return loadAdminSection(sectionId)
+}
+
+export async function persistAdminSection(
+  sectionId: IndicatorSectionId,
+  section: IndicatorSection,
+) {
+  const response = await fetch(`${SECTION_API_BASE}/${sectionId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'same-origin',
+    body: JSON.stringify({ payload: section }),
+  })
+
+  if (!response.ok) {
+    const message = await readResponseMessage(response)
+    throw new Error(message)
+  }
+
+  saveAdminSection(sectionId, section)
+}
+
 export const portalDataClient: PortalDataClient = {
   getDashboard: () => fetchOptionalJson<DashboardData>(`${DATA_BASE}/dashboard.json`),
-  getSection: (sectionId) =>
-    fetchOptionalJson<IndicatorSection>(`${DATA_BASE}/${sectionId}.json`),
+  getSection: (sectionId) => fetchSectionWithFallback(sectionId),
   getMunicipios: () => fetchJson<MunicipioSummary[]>(`${DATA_BASE}/municipios/index.json`),
   getMunicipio: (slug) =>
     fetchOptionalJson<MunicipioDetail>(`${DATA_BASE}/municipios/${slug}.json`),

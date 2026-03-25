@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { cn } from '@/lib/utils/cn'
 import {
   DEFAULT_MAP_VARIABLE_KEY,
@@ -15,10 +16,12 @@ import {
   INDICATOR_SECTION_IDS,
   type IndicatorSectionId,
 } from '@/lib/constants/indicator-sections'
+import { queryKeys } from '@/lib/data/client'
 import type { PortalDataBundle } from '@/types/admin-data'
 
 import { useBundleMutations, type StatusMessage } from './hooks/useBundleMutations'
 import { useImportExport } from './hooks/useImportExport'
+import { useSectionPersistence } from './hooks/useSectionPersistence'
 import { useSpreadsheetState, SHEET_DEFINITIONS, type SheetId } from './hooks/useSpreadsheetState'
 
 import { SpreadsheetShell } from './SpreadsheetShell'
@@ -26,6 +29,8 @@ import { SpreadsheetToolbar } from './SpreadsheetToolbar'
 import { FormulaBar } from './FormulaBar'
 import { SpreadsheetGrid } from './SpreadsheetGrid'
 import { SheetTabBar } from './SheetTabBar'
+
+import { MapaFormPanel } from './MapaFormPanel'
 
 import { municipiosColumns } from './sheets/MunicipiosSheet'
 import { municipioIndicadoresColumns } from './sheets/MunicipioIndicadoresSheet'
@@ -63,13 +68,27 @@ export function AdminDataPage({
   const [mapMunicipioFilter, setMapMunicipioFilter] = useState('')
   const [selectedMunicipioSlug, setSelectedMunicipioSlug] = useState('')
 
+  const prevMapVariableKeyRef = useRef(selectedMapVariableKey)
+
+  const queryClient = useQueryClient()
+
   const spreadsheet = useSpreadsheetState()
   const mutations = useBundleMutations(bundle, setBundle, setStatus)
   const importExport = useImportExport(bundle, setBundle, setStatus)
+  const { requestImmediateSectionPersist } = useSectionPersistence({
+    bundle,
+    queryClient,
+    setStatus,
+  })
 
   useEffect(() => {
     if (initialBundle) setBundle(initialBundle)
   }, [initialBundle])
+
+  useEffect(() => {
+    if (!bundle) return
+    queryClient.setQueryData(queryKeys.portalDataBundle, bundle)
+  }, [bundle, queryClient])
 
   // Auto-dismiss status after 4s
   useEffect(() => {
@@ -168,13 +187,18 @@ export function AdminDataPage({
         mapVariableOptions[0]
       setSelectedMapVariableKey(fallback.key)
       setSelectedMapYear(fallback.years[fallback.years.length - 1] ?? 0)
+      prevMapVariableKeyRef.current = fallback.key
       return
     }
-    const current = mapVariableOptions.find((o) => o.key === selectedMapVariableKey)
-    if (current && !current.years.includes(selectedMapYear)) {
-      setSelectedMapYear(current.years[current.years.length - 1] ?? 0)
+    // Só reseta o ano quando a variável mudou — preserva o ano digitado pelo usuário
+    if (prevMapVariableKeyRef.current !== selectedMapVariableKey) {
+      prevMapVariableKeyRef.current = selectedMapVariableKey
+      const current = mapVariableOptions.find((o) => o.key === selectedMapVariableKey)
+      if (current && current.years.length > 0) {
+        setSelectedMapYear(current.years[current.years.length - 1])
+      }
     }
-  }, [mapVariableOptions, selectedMapVariableKey, selectedMapYear])
+  }, [mapVariableOptions, selectedMapVariableKey])
 
   // Filtered rows for active sheet
   const filteredIndicatorRows = useMemo(
@@ -262,52 +286,12 @@ export function AdminDataPage({
         return {
           data: filteredMapRows,
           columns: mapaColumns,
-          emptyMessage: 'Nenhuma linha municipal encontrada para a variavel/ano atual.',
+          emptyMessage: 'Nenhuma linha municipal encontrada.',
           onCellChange: mutations.updateMapCell,
-          onAddRow: () => mutations.addMapMunicipioRow(selectedMapVariableKey, selectedMapYear),
+          onAddRow: undefined,
           onRemoveRow: undefined,
-          showTemplate: true,
-          sheetControls: (
-            <div className="flex flex-wrap items-center gap-2 border-b border-areia-200 bg-areia-50/30 px-3 py-1.5">
-              <label className="text-[10px] font-bold uppercase tracking-[0.12em] text-areia-400 font-jakarta">
-                Variavel
-              </label>
-              <select
-                value={selectedMapVariableKey}
-                onChange={(e) => setSelectedMapVariableKey(e.currentTarget.value)}
-                className="max-w-[280px] rounded-md border border-areia-200 bg-white px-2 py-1 text-[11px] text-areia-700 font-jakarta"
-              >
-                {mapVariableOptions.map((opt) => (
-                  <option key={opt.key} value={opt.key}>
-                    {opt.sectionLabel} — {opt.indicatorLabel}
-                  </option>
-                ))}
-              </select>
-              <label className="text-[10px] font-bold uppercase tracking-[0.12em] text-areia-400 font-jakarta ml-1">
-                Ano
-              </label>
-              <select
-                value={selectedMapYear}
-                onChange={(e) => setSelectedMapYear(Number(e.currentTarget.value))}
-                className="rounded-md border border-areia-200 bg-white px-2 py-1 text-[11px] text-areia-700 font-jakarta"
-              >
-                {(selectedMapOption?.years ?? []).map((year) => (
-                  <option key={year} value={year}>{year}</option>
-                ))}
-              </select>
-              <input
-                value={mapMunicipioFilter}
-                onChange={(e) => setMapMunicipioFilter(e.currentTarget.value)}
-                placeholder="Filtrar municipio..."
-                className="ml-1 rounded-md border border-areia-200 bg-white px-2 py-1 text-[11px] text-areia-600 font-jakarta placeholder:text-areia-300 w-[160px]"
-              />
-              {selectedMapOption && (
-                <span className="ml-auto text-[10px] text-areia-400 font-jakarta tabular-nums">
-                  {selectedMapOption.source} · anos: {selectedMapOption.years.join(', ')}
-                </span>
-              )}
-            </div>
-          ),
+          showTemplate: false,
+          sheetControls: null,
         }
       case 'indicadores':
         return {
@@ -424,6 +408,12 @@ export function AdminDataPage({
   }
 
   const config = getActiveSheetConfig()
+  const handleMapIndicatorSave = (
+    params: Parameters<typeof mutations.saveMapIndicatorForm>[0],
+  ) => {
+    requestImmediateSectionPersist(params.sectionId)
+    mutations.saveMapIndicatorForm(params)
+  }
 
   return (
     <SpreadsheetShell>
@@ -470,18 +460,28 @@ export function AdminDataPage({
       {/* Sheet-specific controls */}
       {config.sheetControls}
 
-      {/* Grid */}
-      <SpreadsheetGrid
-        data={config.data}
-        columns={config.columns}
-        emptyMessage={config.emptyMessage}
-        selectedCell={spreadsheet.selectedCell}
-        editingCell={spreadsheet.editingCell}
-        onSelectCell={spreadsheet.selectCell}
-        onStartEditing={spreadsheet.startEditing}
-        onStopEditing={spreadsheet.stopEditing}
-        onCellChange={config.onCellChange}
-      />
+      {/* Grid or form panel */}
+      {spreadsheet.activeSheet === 'mapa' ? (
+        <MapaFormPanel
+          bundle={bundle}
+          mapVariableOptions={mapVariableOptions}
+          selectedMapVariableKey={selectedMapVariableKey}
+          onVariableChange={setSelectedMapVariableKey}
+          onSave={handleMapIndicatorSave}
+        />
+      ) : (
+        <SpreadsheetGrid
+          data={config.data}
+          columns={config.columns}
+          emptyMessage={config.emptyMessage}
+          selectedCell={spreadsheet.selectedCell}
+          editingCell={spreadsheet.editingCell}
+          onSelectCell={spreadsheet.selectCell}
+          onStartEditing={spreadsheet.startEditing}
+          onStopEditing={spreadsheet.stopEditing}
+          onCellChange={config.onCellChange}
+        />
+      )}
 
       {/* Sheet tabs */}
       <SheetTabBar

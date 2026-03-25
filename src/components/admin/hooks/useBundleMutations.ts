@@ -13,6 +13,33 @@ export interface StatusMessage {
   message: string
 }
 
+export interface SaveMapIndicatorFormParams {
+  mode: 'edit' | 'new'
+  sectionId: IndicatorSectionId
+  groupId: string
+  indicatorId?: string
+  label: string
+  description: string
+  unit: string
+  source: string
+  year: number
+  values: Record<string, string>
+}
+
+function generateMapIndicatorId(label: string, year: number): string {
+  return (
+    label
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^\w]+/g, '_')
+      .replace(/^_|_$/g, '')
+      .slice(0, 40) +
+    '_' +
+    year
+  )
+}
+
 function parseNumberInput(value: string) {
   const parsed = Number(value)
   return Number.isFinite(parsed) ? parsed : 0
@@ -553,6 +580,60 @@ export function useBundleMutations(
     })
   }
 
+  const saveMapIndicatorForm = (params: SaveMapIndicatorFormParams) => {
+    patchBundle((draft) => {
+      const section = draft.sections[params.sectionId]
+      if (!section) return
+      const group = section.groups.find((g) => g.id === params.groupId)
+      if (!group) return
+
+      const yearValues: Record<string, number> = {}
+      for (const [slug, raw] of Object.entries(params.values)) {
+        const n = Number(raw)
+        if (raw.trim() !== '' && Number.isFinite(n)) yearValues[slug] = n
+      }
+
+      if (params.mode === 'edit' && params.indicatorId) {
+        const indicator = group.indicators.find((i) => i.id === params.indicatorId)
+        if (!indicator) return
+        indicator.label = params.label
+        indicator.description = params.description
+        indicator.unit = params.unit
+        indicator.source = params.source
+        const fallbackYear =
+          Number(section.lastUpdated.slice(0, 4)) || new Date().getFullYear()
+        const existingMapSeries = getIndicatorMapSeries(indicator, fallbackYear) ?? {}
+        if (Object.keys(yearValues).length > 0) {
+          existingMapSeries[String(params.year)] = yearValues
+        } else {
+          delete existingMapSeries[String(params.year)]
+        }
+        indicator.mapSeries = existingMapSeries
+        syncIndicatorMapValues(section.lastUpdated, indicator)
+      } else {
+        const id = generateMapIndicatorId(params.label, params.year)
+        const newIndicator = {
+          id,
+          label: params.label,
+          description: params.description,
+          unit: params.unit,
+          source: params.source,
+          timeSeries: [] as { year: number; value: number }[],
+          mapSeries:
+            Object.keys(yearValues).length > 0
+              ? { [String(params.year)]: yearValues }
+              : {},
+        }
+        group.indicators.push(newIndicator)
+        syncIndicatorMapValues(
+          section.lastUpdated,
+          group.indicators[group.indicators.length - 1],
+        )
+      }
+    })
+    setStatus({ kind: 'success', message: 'Indicador salvo com sucesso.' })
+  }
+
   const removeMunicipioIndicatorRow = (rowId: string) => {
     patchBundle((draft) => {
       const [municipioSlug, section, indicatorId, yearLabel] = rowId.split('::')
@@ -583,6 +664,7 @@ export function useBundleMutations(
     removeIndicatorVariable,
     addMapYear,
     addMapMunicipioRow,
+    saveMapIndicatorForm,
     addMunicipioIndicator,
     removeDashboardKpi,
     removeDashboardSummary,
